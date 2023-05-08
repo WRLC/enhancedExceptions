@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>
+        {% block page_title %}
+            {{ inst.name }} ({{ inst.code }})
+        {% endblock %}
+    </h2>
+    <div class="field">
+        <div class="field-name">API Key</div>
+        <div class="field-value">{{ inst.key }}</div>
+    </div>
+    <div class="field">
+        <div class="field-name">Exceptions Report Path</div>
+        <div class="field-value">{{ inst.exceptions }}</div>
+    </div>
+    <div class="field">
+        <div class="field-name">Transit Report Path</div>
+        <div class="field-value">{{ inst.transit }}</div>
+    </div>
+{% endblock %}
