@@ -95,10 +95,10 @@ class Event(db.Model):
     eventstart = sa.Column(sa.DateTime, nullable=False)
     instcode = sa.Column(sa.ForeignKey(Institution.code))
 
-    def __init__(self, eventid, itemid, eventstart):
-        self.eventid = eventid
+    def __init__(self, itemid, eventstart, instcode):
         self.itemid = itemid
         self.eventstart = eventstart
+        self.instcode = instcode
 
 
 ####################
