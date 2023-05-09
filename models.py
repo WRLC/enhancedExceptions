@@ -60,7 +60,7 @@ class Request(db.Model):
     networknum = sa.Column(sa.Integer, nullable=True)
     partnerstat = sa.Column(sa.String(255), nullable=False)
     reqsend = sa.Column(sa.DateTime, nullable=True)
-    days = sa.Column(sa.Integer, nullable=False)
+    days = sa.Column(sa.Integer, nullable=True)
     requestor = sa.Column(sa.String(255), nullable=False)
     partnername = sa.Column(sa.String(255), nullable=False)
     partnercode = sa.Column(sa.String(255), nullable=False)
@@ -69,7 +69,7 @@ class Request(db.Model):
 
     def __init__(
         self, fulfillmentreqid, requestorid, borreqstat, internalid, borcreate, title, author, networknum, partnerstat,
-        reqsend, days, requestor, partnername, partnercode, instcode
+        reqsend, days, requestor, partnername, partnercode, itemid, instcode
     ):
         self.fulfillmentreqid = fulfillmentreqid
         self.requestorid = requestorid
@@ -85,6 +85,7 @@ class Request(db.Model):
         self.requestor = requestor
         self.partnername = partnername
         self.partnercode = partnercode
+        self.itemid = itemid
         self.instcode = instcode
 
 
@@ -120,13 +121,11 @@ def soupify(response):
 
 
 # Populate a list of Request objects from the Exceptions report
-def get_rows(soup, institution):
+def get_rows(soup):
     rows = soup.find_all('Row')
-    exreport = []
-    for row in rows:
-        exreport.append(row)
-
-    return exreport
+    if len(rows) == 0:
+        return None
+    return rows
 
 
 # Get a list of all institutions from the database
