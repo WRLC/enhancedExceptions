@@ -1,6 +1,6 @@
 from settings import database
 from flask import Flask, render_template
-from models import db, Institution, get_rows, get_all_institutions
+from models import db, Institution, get_all_institutions
 
 app = Flask(__name__)
 
@@ -39,15 +39,9 @@ def institution_detail(code):
 # Report page for a single institution
 @app.route('/institutions/<code>/report')
 def institution_report(code):
-    # Get the institution object
-    institution = Institution(code, None, None, None, None)
-    institution = institution.get_institution_scalar()
-
-    # Get the institution's exceptions report
-    soup = institution.get_exceptions()
-    exreport = get_rows(soup)
-
-    return render_template('report.html', report=exreport, inst=institution)
+    inst = code
+    report = []
+    return render_template('report.html', report=report, inst=inst)
 
 
 if __name__ == '__main__':

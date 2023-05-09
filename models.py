@@ -12,19 +12,18 @@ db = SQLAlchemy()
 
 # Institution object
 class Institution(db.Model):
-    id = sa.Column(sa.Integer, primary_key=True)
-    code = sa.Column(sa.String(255), nullable=False)
+    code = sa.Column(sa.String(255), primary_key=True)
     name = sa.Column(sa.String(255), nullable=False)
     key = sa.Column(sa.String(255), nullable=True)
     exceptions = sa.Column(sa.String(255), nullable=True)
-    transit = sa.Column(sa.String(255), nullable=True)
+    events = sa.Column(sa.String(255), nullable=True)
 
-    def __init__(self, code, name, key, exceptions, transit):
+    def __init__(self, code, name, key, exceptions, events):
         self.code = code
         self.name = name
         self.key = key
         self.exceptions = exceptions
-        self.transit = transit
+        self.events = events
 
     # Get a single institution from the database
     def get_institution(self):
@@ -34,11 +33,6 @@ class Institution(db.Model):
         )
         return institution
 
-    # Get a single institution from the database as a scalar
-    def get_institution_scalar(self):
-        institution = db.session.execute(db.select(Institution).filter_by(code=self.code)).scalar_one()
-        return institution
-
     # Get a single institution's exceptions report from the Alma Analytics API
     def get_exceptions(self):
         params = 'analytics/reports?limit=1000&col_names=true&path=' + self.exceptions + '&apikey=' + self.key
@@ -46,12 +40,36 @@ class Institution(db.Model):
         exceptions = soupify(response)
         return exceptions
 
+    def get_events(self):
+        params = 'analytics/reports?limit=1000&col_names=true&path=' + self.events + '&apikey=' + self.key
+        response = api_call(params)
+        events = soupify(response)
+        return events
+
 
 # Request object
-class Request:
+class Request(db.Model):
+    id = sa.Column(sa.Integer, primary_key=True)
+    fulfillmentreqid = sa.Column(sa.Integer, nullable=False)
+    requestorid = sa.Column(sa.String(255), nullable=False)
+    borreqstat = sa.Column(sa.String(255), nullable=False)
+    internalid = sa.Column(sa.Integer, nullable=False)
+    borcreate = sa.Column(sa.Date, nullable=False)
+    title = sa.Column(sa.String(255), nullable=False)
+    author = sa.Column(sa.String(255), nullable=True)
+    networknum = sa.Column(sa.Integer, nullable=True)
+    partnerstat = sa.Column(sa.String(255), nullable=False)
+    reqsend = sa.Column(sa.DateTime, nullable=True)
+    days = sa.Column(sa.Integer, nullable=False)
+    requestor = sa.Column(sa.String(255), nullable=False)
+    partnername = sa.Column(sa.String(255), nullable=False)
+    partnercode = sa.Column(sa.String(255), nullable=False)
+    itemid = sa.Column(sa.Integer, nullable=True)
+    instcode = sa.Column(sa.ForeignKey(Institution.code))
+
     def __init__(
         self, fulfillmentreqid, requestorid, borreqstat, internalid, borcreate, title, author, networknum, partnerstat,
-        reqsend, days, requestor, partnername, partnercode
+        reqsend, days, requestor, partnername, partnercode, instcode
     ):
         self.fulfillmentreqid = fulfillmentreqid
         self.requestorid = requestorid
@@ -67,55 +85,20 @@ class Request:
         self.requestor = requestor
         self.partnername = partnername
         self.partnercode = partnercode
-
-    # Populate Request object from a row in the Exceptions report
-    def populate_from_report(self, row):
-        try:
-            self.author = row.Column1.get_text()
-        except AttributeError:
-            self.author = None
-
-        try:
-            self.networknum = row.Column2.get_text()
-        except AttributeError:
-            self.networknum = None
-
-        self.title = row.Column3.get_text()
-        self.borcreate = row.Column4.get_text()
-        self.borreqstat = row.Column5.get_text()
-        self.fulfillmentreqid = row.Column6.get_text()
-        self.internalid = row.Column7.get_text()
-        self.partnerstat = row.Column8.get_text()
-
-        try:
-            self.reqsend = row.Column9.get_text()
-
-        except AttributeError:
-            self.reqsend = None
-
-        self.partnercode = row.Column10.get_text()
-        self.partnername = row.Column11.get_text()
-        self.requestor = row.Column12.get_text()
-        self.requestorid = row.Column13.get_text()
-
-        try:
-            self.days = row.Column14.get_text()
-        except AttributeError:
-            self.days = None
-
-        return self
-
-    # Get Borrowing Request details from Alma User/Fulfillment API
-    def get_request(self, key):
-        params = 'users/' + self.requestorid + '/requests/' + self.fulfillmentreqid + '?apikey=' + key
-        response = api_call(params)
-        request = soupify(response)
-        return request
+        self.instcode = instcode
 
 
-class Event:
-    def __init__(self, eventid):
+# Event object
+class Event(db.Model):
+    id = sa.Column(sa.Integer, primary_key=True)
+    itemid = sa.Column(sa.Integer, nullable=False)
+    eventstart = sa.Column(sa.DateTime, nullable=False)
+    instcode = sa.Column(sa.ForeignKey(Institution.code))
+
+    def __init__(self, eventid, itemid, eventstart):
         self.eventid = eventid
+        self.itemid = itemid
+        self.eventstart = eventstart
 
 
 ####################
@@ -137,13 +120,11 @@ def soupify(response):
 
 
 # Populate a list of Request objects from the Exceptions report
-def get_rows(soup):
+def get_rows(soup, institution):
     rows = soup.find_all('Row')
     exreport = []
     for row in rows:
-        instance = Request(None, None, None, None, None, None, None, None, None, None, None, None, None, None)
-        instance.populate_from_report(row)
-        exreport.append(instance)
+        exreport.append(row)
 
     return exreport
 
