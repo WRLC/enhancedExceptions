@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>
+        {% block page_title %}
+            {{ inst.name }} ({{ inst.code }})
+        {% endblock %}
+    </h2>
+    <form method="post">
+        <div class="name">
+            <label for="name">Institution Name</label>
+            <input type="text" name="name" id="name" value="{{ inst.name }}" />
+        </div>
+        <div class="code">
+            <label for="code">Institution Code</label>
+            <input type="text" name="code" id="code" value="{{ inst.code }}" />
+        </div>
+        <div class="key">
+            <label for="key">Alma API Key</label>
+            <input type="text" name="key" id="key" value="{{ inst.key }}" />
+        </div>
+        <div class="exceptions">
+            <label for="exceptions">Exceptions Report Path</label>
+            <input type="text" name="exceptions" id="exceptions" value="{{ inst.exceptions }}" />
+        </div>
+        <div class="events">
+            <label for="events">Events Report Path</label>
+            <input type="text" name="events" id="events" value="{{ inst.events }}" />
+        </div>
+        <div class="submit">
+            <input type="submit" value="Update institution" />
+        </div>
+    </form>
+{% endblock %}
