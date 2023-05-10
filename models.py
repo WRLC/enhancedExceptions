@@ -1,9 +1,9 @@
 import sqlalchemy as sa
 from flask_sqlalchemy import SQLAlchemy
-import requests
-from bs4 import BeautifulSoup
+from utils import soupify, api_call, construct_request_tuple
 
 db = SQLAlchemy()
+
 
 ####################
 #  Object Classes  #
@@ -40,11 +40,32 @@ class Institution(db.Model):
         exceptions = soupify(response)
         return exceptions
 
+    # Construct a request object from a single row in the exceptions report
+    def construct_request(self, exrow):
+        request_tuple = construct_request_tuple(exrow)
+
+        # Create a new request object
+        exinstance = Request(request_tuple[0], request_tuple[1], request_tuple[2], request_tuple[3], request_tuple[4],
+                             request_tuple[5], request_tuple[6], request_tuple[7], request_tuple[8], request_tuple[9],
+                             request_tuple[10], request_tuple[11], request_tuple[12], request_tuple[13],
+                             request_tuple[14], self.code)
+
+        return exinstance
+
+    # Get a single institution's events report from the Alma Analytics API
     def get_events(self):
         params = 'analytics/reports?limit=1000&col_names=true&path=' + self.events + '&apikey=' + self.key
         response = api_call(params)
         events = soupify(response)
         return events
+
+    # Construct an event object from a single row in the events report
+    def construct_event(self, evrow):
+        eventtype = evrow.Column1.get_text()  # Event type description
+        eventdate = evrow.Column2.get_text()  # Event start date
+        evinstance = Event(eventtype, eventdate, self.code)  # Create a new event object
+
+        return evinstance
 
 
 # Request object
@@ -103,30 +124,8 @@ class Event(db.Model):
 
 
 ####################
-# Helper functions #
+#  Helper Methods  #
 ####################
-
-# Make an API call to Alma
-def api_call(params):
-    api_route = 'https://api-na.hosted.exlibrisgroup.com/almaws/v1/'
-    path = api_route + params
-    response = requests.request('GET', path).content
-    return response
-
-
-# Turn the API response into a BeautifulSoup object
-def soupify(response):
-    soup = BeautifulSoup(response, features="xml")
-    return soup
-
-
-# Populate a list of Request objects from the Exceptions report
-def get_rows(soup):
-    rows = soup.find_all('Row')
-    if len(rows) == 0:
-        return None
-    return rows
-
 
 # Get a list of all institutions from the database
 def get_all_institutions():
