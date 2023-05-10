@@ -13,8 +13,14 @@
             <tbody>
                 {% for institution in institutions %}
                     <tr>
-                        <td><a href="/institutions/{{ institution.code }}">{{ institution.name }}</a></td>
-                        <td>{{ institution.code }}</td>
+                        <td>
+                            <a href="{{ url_for('institution_detail', code=institution.code) }}">
+                                {{ institution.name }}
+                            </a>
+                        </td>
+                        <td>
+                            {{ institution.code }}
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>

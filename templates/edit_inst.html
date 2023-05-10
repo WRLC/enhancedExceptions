@@ -27,8 +27,9 @@
             <label for="events">Events Report Path</label>
             <input type="text" name="events" id="events" value="{{ inst.events }}" />
         </div>
-        <div class="submit">
+        <div class="actions">
             <input type="submit" value="Update institution" />
+            <a class="button" href="{{ url_for('institution_detail', code=inst.code) }}">Cancel</a>
         </div>
     </form>
 {% endblock %}

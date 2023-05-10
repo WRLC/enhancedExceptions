@@ -9,7 +9,6 @@ db = SQLAlchemy()
 #  Object Classes  #
 ####################
 
-
 # Institution object
 class Institution(db.Model):
     code = sa.Column(sa.String(255), primary_key=True)

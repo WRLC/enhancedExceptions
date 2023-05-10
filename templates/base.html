@@ -7,6 +7,12 @@
 <body>
     <nav>
         <h1>{% block navtitle %}WRLC Enhanced Exceptions Reports{% endblock %}</h1>
+        <div class="menu">
+                <ul class="menu">
+                    <li><a href="{{ url_for('index') }}">Home</a></li>
+                    <li><a href="{{ url_for('admin') }}">Admin</a></li>
+                </ul>
+        </div>
     </nav>
     <div class="messages">
         {% with messages = get_flashed_messages() %}

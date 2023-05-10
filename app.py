@@ -19,9 +19,13 @@ def index():
     return render_template('index.html')
 
 
-# List of all institutions
-@app.route('/institutions')
-def institutions():
+@app.route('/admin')
+def admin():
+    return render_template('admin.html')
+
+
+@app.route('/admin/institutions')
+def admin_institutions():
     # Get the list of institutions
     insts = get_all_institutions()
 
@@ -29,8 +33,8 @@ def institutions():
 
 
 # Create a new institution
-@app.route('/institutions/new', methods=['GET', 'POST'])
-def new_institution():
+@app.route('/admin/institutions/add', methods=['GET', 'POST'])
+def add_institution():
     if request.method == 'POST':
         if not request.form['code'] or not request.form['name'] or not request.form['key'] \
                 or not request.form['exceptions'] or not request.form['events']:
@@ -46,7 +50,7 @@ def new_institution():
 
 
 # Detail page for a single institution
-@app.route('/institutions/<code>')
+@app.route('/admin/institutions/<code>')
 def institution_detail(code):
     # Get the institution object
     institution = Institution(code, None, None, None, None)
@@ -56,7 +60,7 @@ def institution_detail(code):
 
 
 # Edit page for a single institution
-@app.route('/institutions/<code>/edit', methods=['GET', 'POST'])
+@app.route('/admin/institutions/<code>/edit', methods=['GET', 'POST'])
 def institution_edit(code):
     # Get the institution object
     institution = Institution(code, None, None, None, None)
@@ -76,14 +80,6 @@ def institution_edit(code):
             flash('Record was successfully updated', 'success')
             return redirect(url_for('institution_detail', code=institution.code))
     return render_template('edit_inst.html', inst=institution)
-
-
-# Report page for a single institution
-@app.route('/institutions/<code>/report')
-def institution_report(code):
-    inst = code
-    report = []
-    return render_template('report.html', report=report, inst=inst)
 
 
 if __name__ == '__main__':
