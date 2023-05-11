@@ -1,16 +1,37 @@
 from settings import database
 from flask import Flask, render_template, request, flash, redirect, url_for
-from models import db, Institution, get_all_institutions
+from models import Institution, get_all_institutions, Request, Event
+from utils import database_add, delete_rows, get_rows, db
+import schedulers
 import os
+from flask_apscheduler import APScheduler
+import atexit
+import sys
 
+
+# create app
 app = Flask(__name__)
-
+app.config['SCHEDULER_API_ENABLED'] = True
 app.config['SECRET_KEY'] = os.urandom(24)
 app.config['SQLALCHEMY_DATABASE_URI'] = database
 db.init_app(app)
 
 with app.app_context():
     db.create_all()
+
+# scheduler
+scheduler = APScheduler()
+scheduler.init_app(app)
+scheduler.start()
+
+# Shut down the scheduler when exiting the app
+atexit.register(lambda: scheduler.shutdown())
+
+
+@scheduler.task('cron', id='update_reports', minute=3)
+def update_reports():
+    with scheduler.app.app_context():
+        schedulers.update_reports()
 
 
 # Home page

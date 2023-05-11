@@ -28,8 +28,10 @@ def get_rows(soup):
 
 
 def delete_rows(obtype, instcode):
-    db.session.delete(obtype).where(obtype.instcode == instcode)
-    db.session.commit()
+    objs = obtype.query.filter_by(instcode=instcode).all()
+    for obj in objs:
+        db.session.delete(obj)
+        db.session.commit()
 
 
 def database_add(dbrow):
@@ -46,29 +48,29 @@ def construct_request_tuple(exrow):
     title = exrow.Column3.get_text()  # Title
 
     # Check for an author
-    if exrow.Column1.get_text():
+    try:
         author = exrow.Column1.get_text()  # Author
-    else:
+    except AttributeError:
         author = None  # If no author, set to None
 
     # Check for a network number
-    if exrow.Column2.get_text():
+    try:
         networknum = exrow.Column2.get_text()  # Network number
-    else:
+    except AttributeError:
         networknum = None  # If no network number, set to None
 
     partnerstat = exrow.Column9.get_text()  # Partner active status
 
     # Check for a request sending date
-    if exrow.Column10.get_text():
+    try:
         reqsend = exrow.Column10.get_text()  # Request sending date
-    else:
+    except AttributeError:
         reqsend = None  # If no request sending date, set to None
 
     # Check for a days since request
-    if exrow.Column15.get_text():
+    try:
         days = exrow.Column15.get_text()  # Days since request
-    else:
+    except AttributeError:
         days = None  # If no days since request, set to None
 
     requestor = exrow.Column13.get_text()  # Requestor
@@ -76,9 +78,9 @@ def construct_request_tuple(exrow):
     partnercode = exrow.Column11.get_text()  # Partner code
 
     # Check for an item ID
-    if exrow.Column8.get_text():
+    try:
         itemid = exrow.Column8.get_text()  # Item ID
-    else:
+    except AttributeError:
         itemid = None  # If no item ID, set to None
 
     request = (fulfillmentreqid, requestorid, borreqstat, internalid, borcreate, title, author, networknum, partnerstat,

@@ -1,8 +1,5 @@
 import sqlalchemy as sa
-from flask_sqlalchemy import SQLAlchemy
-from utils import soupify, api_call, construct_request_tuple
-
-db = SQLAlchemy()
+from utils import soupify, api_call, construct_request_tuple, db
 
 
 ####################
@@ -70,21 +67,21 @@ class Institution(db.Model):
 # Request object
 class Request(db.Model):
     id = sa.Column(sa.Integer, primary_key=True)
-    fulfillmentreqid = sa.Column(sa.Integer, nullable=False)
+    fulfillmentreqid = sa.Column(sa.BigInteger, nullable=False)
     requestorid = sa.Column(sa.String(255), nullable=False)
     borreqstat = sa.Column(sa.String(255), nullable=False)
-    internalid = sa.Column(sa.Integer, nullable=False)
+    internalid = sa.Column(sa.BigInteger, nullable=False)
     borcreate = sa.Column(sa.Date, nullable=False)
     title = sa.Column(sa.String(255), nullable=False)
     author = sa.Column(sa.String(255), nullable=True)
-    networknum = sa.Column(sa.Integer, nullable=True)
+    networknum = sa.Column(sa.BigInteger, nullable=True)
     partnerstat = sa.Column(sa.String(255), nullable=False)
     reqsend = sa.Column(sa.DateTime, nullable=True)
     days = sa.Column(sa.Integer, nullable=True)
     requestor = sa.Column(sa.String(255), nullable=False)
     partnername = sa.Column(sa.String(255), nullable=False)
     partnercode = sa.Column(sa.String(255), nullable=False)
-    itemid = sa.Column(sa.Integer, nullable=True)
+    itemid = sa.Column(sa.BigInteger, nullable=True)
     instcode = sa.Column(sa.ForeignKey(Institution.code))
 
     def __init__(
@@ -112,7 +109,7 @@ class Request(db.Model):
 # Event object
 class Event(db.Model):
     id = sa.Column(sa.Integer, primary_key=True)
-    itemid = sa.Column(sa.Integer, nullable=False)
+    itemid = sa.Column(sa.BigInteger, nullable=False)
     eventstart = sa.Column(sa.DateTime, nullable=False)
     instcode = sa.Column(sa.ForeignKey(Institution.code))
 
