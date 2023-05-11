@@ -1,6 +1,6 @@
 from settings import database
 from flask import Flask, render_template, request, flash, redirect, url_for
-from models import Institution, get_all_institutions
+from models import Institution, get_all_institutions, Request, Event
 from utils import db
 import schedulers
 import os
@@ -27,7 +27,7 @@ scheduler.start()
 atexit.register(lambda: scheduler.shutdown())
 
 
-@scheduler.task('cron', id='update_reports', minute=3)
+@scheduler.task('cron', id='update_reports', minute=14)
 def update_reports():
     with scheduler.app.app_context():
         schedulers.update_reports()
@@ -37,6 +37,26 @@ def update_reports():
 @app.route('/')
 def index():
     return render_template('index.html')
+
+
+@app.route('/reports')
+def reports():
+    # Get the list of institutions
+    insts = get_all_institutions()
+
+    return render_template('reports.html', institutions=insts)
+
+
+# Report page
+@app.route('/reports/<code>')
+def report(code):
+    inst = db.session.execute(db.select(Institution).filter(Institution.code == code)).scalar_one()
+    requests = db.session.execute(db.select(
+        Request.borreqstat, Request.internalid, Request.borcreate, Request.title, Request.author, Request.networknum,
+        Request.partnerstat, Request.reqsend, Request.days, Request.requestor, Request.partnername, Request.partnercode,
+        Event.eventstart
+    ).join(Event, Event.itemid == Request.itemid, isouter=True).filter(Request.instcode == code)).all()
+    return render_template('report.html', requests=requests, inst=inst)
 
 
 @app.route('/admin')

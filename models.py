@@ -81,7 +81,7 @@ class Request(db.Model):
     requestor = sa.Column(sa.String(255), nullable=False)
     partnername = sa.Column(sa.String(255), nullable=False)
     partnercode = sa.Column(sa.String(255), nullable=False)
-    itemid = sa.Column(sa.BigInteger, nullable=True)
+    itemid = sa.Column(sa.BigInteger, nullable=True, index=True)
     instcode = sa.Column(sa.ForeignKey(Institution.code))
 
     def __init__(
@@ -109,7 +109,7 @@ class Request(db.Model):
 # Event object
 class Event(db.Model):
     id = sa.Column(sa.Integer, primary_key=True)
-    itemid = sa.Column(sa.BigInteger, nullable=False)
+    itemid = sa.Column(sa.BigInteger, sa.ForeignKey(Request.itemid))
     eventstart = sa.Column(sa.DateTime, nullable=False)
     instcode = sa.Column(sa.ForeignKey(Institution.code))
 

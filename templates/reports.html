@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Reports</h2>
+    <p>Reports are generated from the data in the database.</p>
+    {% if institutions %}
+        <ul>
+        {% for institution in institutions %}
+            <li><a href="{{ url_for('report', code=institution.code) }}">{{ institution.name }}</a> ({{ institution.code }})</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No reports are available.</p>
+    {% endif %}
+
+{% endblock %}
