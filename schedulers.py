@@ -1,5 +1,4 @@
-import sys
-from models import Institution, Request, Event, get_all_institutions
+from models import Request, Event, get_all_institutions
 from utils import database_add, delete_rows, get_rows
 
 

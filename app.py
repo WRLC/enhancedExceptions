@@ -1,12 +1,11 @@
 from settings import database
 from flask import Flask, render_template, request, flash, redirect, url_for
-from models import Institution, get_all_institutions, Request, Event
-from utils import database_add, delete_rows, get_rows, db
+from models import Institution, get_all_institutions
+from utils import db
 import schedulers
 import os
 from flask_apscheduler import APScheduler
 import atexit
-import sys
 
 
 # create app
