@@ -55,7 +55,9 @@ def report(code):
         Request.borreqstat, Request.internalid, Request.borcreate, Request.title, Request.author, Request.networknum,
         Request.partnerstat, Request.reqsend, Request.days, Request.requestor, Request.partnername, Request.partnercode,
         Event.eventstart
-    ).join(Event, Event.itemid == Request.itemid, isouter=True).filter(Request.instcode == code)).all()
+    ).join(Event, Event.itemid == Request.itemid, isouter=True).filter(Request.instcode == code).order_by(
+        Request.borreqstat, Request.internalid.desc(), Request.borcreate.desc(), Request.reqsend.desc()
+    )).all()
     return render_template('report.html', requests=requests, inst=inst)
 
 
