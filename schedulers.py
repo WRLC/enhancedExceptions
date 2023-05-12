@@ -2,6 +2,7 @@ from models import Request, Event, get_all_institutions
 from utils import database_add, delete_rows, get_rows
 
 
+# Update reports for all institutions
 def update_reports():
     # Get all institutions
     institutions = get_all_institutions()
