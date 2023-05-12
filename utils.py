@@ -27,6 +27,7 @@ def get_rows(soup):
     return rows
 
 
+# Delete all rows from a table for a given institution
 def delete_rows(obtype, instcode):
     objs = obtype.query.filter_by(instcode=instcode).all()
     for obj in objs:
@@ -34,11 +35,13 @@ def delete_rows(obtype, instcode):
         db.session.commit()
 
 
+# Add a row to the database
 def database_add(dbrow):
     db.session.add(dbrow)  # Add the request to the database
     db.session.commit()  # Commit the request to the database
 
 
+# Construct a request object from a single row in the exceptions report
 def construct_request_tuple(exrow):
     fulfillmentreqid = exrow.Column6.get_text()  # Fulfillment request ID
     requestorid = exrow.Column14.get_text()  # User primary identifier

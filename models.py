@@ -1,4 +1,5 @@
 import sqlalchemy as sa
+from flask import flash, redirect, url_for
 from utils import soupify, api_call, construct_request_tuple, db
 
 
@@ -21,20 +22,23 @@ class Institution(db.Model):
         self.exceptions = exceptions
         self.events = events
 
-    # Get a single institution from the database
-    def get_institution(self):
-        institution = db.one_or_404(
-            db.select(Institution).filter_by(code=self.code),
-            description=f"Institution '{self.code}' not found",
-        )
-        return institution
-
     # Get a single institution's exceptions report from the Alma Analytics API
     def get_exceptions(self):
         params = 'analytics/reports?limit=1000&col_names=true&path=' + self.exceptions + '&apikey=' + self.key
         response = api_call(params)
         exceptions = soupify(response)
         return exceptions
+
+    # Get a single institution's requests from the database
+    def get_requests(self):
+        requests = db.session.execute(db.select(
+            Request.borreqstat, Request.internalid, Request.borcreate, Request.title, Request.author,
+            Request.networknum, Request.partnerstat, Request.reqsend, Request.days, Request.requestor,
+            Request.partnername, Request.partnercode, Event.eventstart
+        ).join(Event, Event.itemid == Request.itemid, isouter=True).filter(Request.instcode == self.code).order_by(
+            Request.borreqstat, Request.internalid.desc(), Request.borcreate.desc(), Request.reqsend.desc()
+        )).all()
+        return requests
 
     # Construct a request object from a single row in the exceptions report
     def construct_request(self, exrow):
@@ -127,3 +131,48 @@ class Event(db.Model):
 def get_all_institutions():
     institutions = db.session.execute(db.select(Institution).order_by(Institution.name)).scalars()
     return institutions
+
+
+# Get a single institution from the database
+def get_institution(code):
+    institution = db.one_or_404(
+        db.select(Institution).filter_by(code=code),
+        description=f"Institution '{code}' not found",
+    )
+    return institution
+
+
+# Get a single institution from the database as a scalar
+def get_institution_scalar(code):
+    inst = db.session.execute(db.select(Institution).filter(Institution.code == code)).scalar_one()
+    return inst
+
+
+# Validate and submit the add institution form
+def submit_inst_add_form(request):
+    if not request.form['code'] or not request.form['name'] or not request.form['key'] or not \
+            request.form['exceptions'] or not request.form['events']:
+        flash('Please enter all the fields', 'error')
+    else:
+        institution = Institution(request.form['code'], request.form['name'], request.form['key'],
+                                  request.form['exceptions'], request.form['events'])
+        db.session.add(institution)
+        db.session.commit()
+        flash('Record was successfully added', 'success')
+        return redirect(url_for('institution_detail', code=institution.code))
+
+
+# Validate and submit the edit institution form
+def submit_inst_edit_form(request, institution):
+    if not request.form['code'] or not request.form['name'] or not request.form['key'] \
+            or not request.form['exceptions'] or not request.form['events']:
+        flash('Please enter all the fields', 'error')
+    else:
+        institution.code = request.form['code']
+        institution.name = request.form['name']
+        institution.key = request.form['key']
+        institution.exceptions = request.form['exceptions']
+        institution.events = request.form['events']
+        db.session.commit()
+        flash('Record was successfully updated', 'success')
+        return redirect(url_for('institution_detail', code=institution.code))

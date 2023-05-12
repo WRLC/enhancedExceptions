@@ -1,6 +1,9 @@
 from settings import database
-from flask import Flask, render_template, request, flash, redirect, url_for
-from models import Institution, get_all_institutions, Request, Event
+from flask import Flask, render_template, request
+from models import (
+    Institution, get_all_institutions, submit_inst_add_form, submit_inst_edit_form, get_institution_scalar,
+    get_institution
+)
 from utils import db
 import schedulers
 import os
@@ -15,10 +18,11 @@ app.config['SECRET_KEY'] = os.urandom(24)
 app.config['SQLALCHEMY_DATABASE_URI'] = database
 db.init_app(app)
 
+# create database
 with app.app_context():
     db.create_all()
 
-# scheduler
+# create scheduler
 scheduler = APScheduler()
 scheduler.init_app(app)
 scheduler.start()
@@ -27,6 +31,7 @@ scheduler.start()
 atexit.register(lambda: scheduler.shutdown())
 
 
+# Background task to update the reports
 @scheduler.task('cron', id='update_reports', minute=14)
 def update_reports():
     with scheduler.app.app_context():
@@ -39,6 +44,7 @@ def index():
     return render_template('index.html')
 
 
+# List of reports page
 @app.route('/reports')
 def reports():
     # Get the list of institutions
@@ -50,27 +56,22 @@ def reports():
 # Report page
 @app.route('/reports/<code>')
 def report(code):
-    inst = db.session.execute(db.select(Institution).filter(Institution.code == code)).scalar_one()
-    requests = db.session.execute(db.select(
-        Request.borreqstat, Request.internalid, Request.borcreate, Request.title, Request.author, Request.networknum,
-        Request.partnerstat, Request.reqsend, Request.days, Request.requestor, Request.partnername, Request.partnercode,
-        Event.eventstart
-    ).join(Event, Event.itemid == Request.itemid, isouter=True).filter(Request.instcode == code).order_by(
-        Request.borreqstat, Request.internalid.desc(), Request.borcreate.desc(), Request.reqsend.desc()
-    )).all()
+    inst = get_institution_scalar(code)
+    requests = Institution.get_requests(inst)
     return render_template('report.html', requests=requests, inst=inst)
 
 
+# Admin page
 @app.route('/admin')
 def admin():
     return render_template('admin.html')
 
 
+# Institutions admin page
 @app.route('/admin/institutions')
 def admin_institutions():
     # Get the list of institutions
     insts = get_all_institutions()
-
     return render_template('institutions.html', institutions=insts)
 
 
@@ -78,16 +79,7 @@ def admin_institutions():
 @app.route('/admin/institutions/add', methods=['GET', 'POST'])
 def add_institution():
     if request.method == 'POST':
-        if not request.form['code'] or not request.form['name'] or not request.form['key'] \
-                or not request.form['exceptions'] or not request.form['events']:
-            flash('Please enter all the fields', 'error')
-        else:
-            institution = Institution(request.form['code'], request.form['name'], request.form['key'],
-                                      request.form['exceptions'], request.form['events'])
-            db.session.add(institution)
-            db.session.commit()
-            flash('Record was successfully added', 'success')
-            return redirect(url_for('institution_detail', code=institution.code))
+        submit_inst_add_form(request)
     return render_template('create_inst.html')
 
 
@@ -95,9 +87,7 @@ def add_institution():
 @app.route('/admin/institutions/<code>')
 def institution_detail(code):
     # Get the institution object
-    institution = Institution(code, None, None, None, None)
-    institution = institution.get_institution()
-
+    institution = get_institution(code)
     return render_template('institution.html', inst=institution)
 
 
@@ -105,22 +95,10 @@ def institution_detail(code):
 @app.route('/admin/institutions/<code>/edit', methods=['GET', 'POST'])
 def institution_edit(code):
     # Get the institution object
-    institution = Institution(code, None, None, None, None)
-    institution = institution.get_institution()
+    institution = get_institution(code)
 
     if request.method == 'POST':
-        if not request.form['code'] or not request.form['name'] or not request.form['key'] \
-                or not request.form['exceptions'] or not request.form['events']:
-            flash('Please enter all the fields', 'error')
-        else:
-            institution.code = request.form['code']
-            institution.name = request.form['name']
-            institution.key = request.form['key']
-            institution.exceptions = request.form['exceptions']
-            institution.events = request.form['events']
-            db.session.commit()
-            flash('Record was successfully updated', 'success')
-            return redirect(url_for('institution_detail', code=institution.code))
+        submit_inst_edit_form(request, institution)
     return render_template('edit_inst.html', inst=institution)
 
 
