@@ -80,13 +80,16 @@ def construct_request_tuple(exrow):
     partnername = exrow.Column12.get_text()  # Partner name
     partnercode = exrow.Column11.get_text()  # Partner code
 
-    # Check for an item ID
-    try:
-        itemid = exrow.Column8.get_text()  # Item ID
-    except AttributeError:
-        itemid = None  # If no item ID, set to None
-
     request = (fulfillmentreqid, requestorid, borreqstat, internalid, borcreate, title, author, networknum, partnerstat,
-               reqsend, days, requestor, partnername, partnercode, itemid)
+               reqsend, days, requestor, partnername, partnercode)
 
     return request
+
+
+# Get all the rows from an analytics report
+def get_report(path, key):
+    params = 'analytics/reports?limit=1000&col_names=true&path=' + path + '&apikey=' + key
+    response = api_call(params)
+    soup = soupify(response)
+    rows = get_rows(soup)
+    return rows

@@ -1,6 +1,6 @@
 import sqlalchemy as sa
 from flask import flash, redirect, url_for
-from utils import soupify, api_call, construct_request_tuple, db
+from utils import construct_request_tuple, db
 
 
 ####################
@@ -13,29 +13,27 @@ class Institution(db.Model):
     name = sa.Column(sa.String(255), nullable=False)
     key = sa.Column(sa.String(255), nullable=True)
     exceptions = sa.Column(sa.String(255), nullable=True)
+    items = sa.Column(sa.String(255), nullable=True)
     events = sa.Column(sa.String(255), nullable=True)
 
-    def __init__(self, code, name, key, exceptions, events):
+    def __init__(self, code, name, key, exceptions, items, events):
         self.code = code
         self.name = name
         self.key = key
         self.exceptions = exceptions
+        self.items = items
         self.events = events
 
-    # Get a single institution's exceptions report from the Alma Analytics API
-    def get_exceptions(self):
-        params = 'analytics/reports?limit=1000&col_names=true&path=' + self.exceptions + '&apikey=' + self.key
-        response = api_call(params)
-        exceptions = soupify(response)
-        return exceptions
-
     # Get a single institution's requests from the database
+    # TODO: Rewrite this to use item table
     def get_requests(self):
         requests = db.session.execute(db.select(
             Request.borreqstat, Request.internalid, Request.borcreate, Request.title, Request.author,
             Request.networknum, Request.partnerstat, Request.reqsend, Request.days, Request.requestor,
-            Request.partnername, Request.partnercode, Event.eventstart
-        ).join(Event, Event.itemid == Request.itemid, isouter=True).filter(Request.instcode == self.code).order_by(
+            Request.partnername, Request.partnercode, Item.itemid
+        ).join(Item, Item.fulfillmentreqid == Request.fulfillmentreqid, isouter=True).filter(
+            Request.instcode == self.code
+        ).order_by(
             Request.borreqstat, Request.internalid.desc(), Request.borcreate.desc(), Request.reqsend.desc()
         )).all()
         return requests
@@ -48,22 +46,23 @@ class Institution(db.Model):
         exinstance = Request(request_tuple[0], request_tuple[1], request_tuple[2], request_tuple[3], request_tuple[4],
                              request_tuple[5], request_tuple[6], request_tuple[7], request_tuple[8], request_tuple[9],
                              request_tuple[10], request_tuple[11], request_tuple[12], request_tuple[13],
-                             request_tuple[14], self.code)
+                             self.code)
 
         return exinstance
 
-    # Get a single institution's events report from the Alma Analytics API
-    def get_events(self):
-        params = 'analytics/reports?limit=1000&col_names=true&path=' + self.events + '&apikey=' + self.key
-        response = api_call(params)
-        events = soupify(response)
-        return events
+    # Construct an item object from a single row in the items report
+    def construct_item(self, itrow):
+        fulfillmentreqid = itrow.Column1.get_text()  # Fulfillment request ID
+        itemid = itrow.Column2.get_text()  # Item ID
+        itinstance = Item(fulfillmentreqid, itemid, self.code)  # Create a new item object
+
+        return itinstance
 
     # Construct an event object from a single row in the events report
     def construct_event(self, evrow):
-        eventtype = evrow.Column1.get_text()  # Event type description
-        eventdate = evrow.Column2.get_text()  # Event start date
-        evinstance = Event(eventtype, eventdate, self.code)  # Create a new event object
+        itemid = evrow.Column2.get_text()  # Event type description
+        eventstart = evrow.Column1.get_text()  # Event start date
+        evinstance = Event(itemid, eventstart, self.code)  # Create a new event object
 
         return evinstance
 
@@ -85,12 +84,11 @@ class Request(db.Model):
     requestor = sa.Column(sa.String(255), nullable=False)
     partnername = sa.Column(sa.String(255), nullable=False)
     partnercode = sa.Column(sa.String(255), nullable=False)
-    itemid = sa.Column(sa.BigInteger, nullable=True, index=True)
     instcode = sa.Column(sa.ForeignKey(Institution.code))
 
     def __init__(
         self, fulfillmentreqid, requestorid, borreqstat, internalid, borcreate, title, author, networknum, partnerstat,
-        reqsend, days, requestor, partnername, partnercode, itemid, instcode
+        reqsend, days, requestor, partnername, partnercode, instcode
     ):
         self.fulfillmentreqid = fulfillmentreqid
         self.requestorid = requestorid
@@ -106,14 +104,26 @@ class Request(db.Model):
         self.requestor = requestor
         self.partnername = partnername
         self.partnercode = partnercode
+        self.instcode = instcode
+
+
+# Item object
+class Item(db.Model):
+    id = sa.Column(sa.Integer, primary_key=True)
+    itemid = sa.Column(sa.BigInteger, nullable=False)
+    fulfillmentreqid = sa.Column(sa.BigInteger, nullable=False)
+    instcode = sa.Column(sa.ForeignKey(Institution.code))
+
+    def __init__(self, itemid, fulfillmentreqid, instcode):
         self.itemid = itemid
+        self.fulfillmentreqid = fulfillmentreqid
         self.instcode = instcode
 
 
 # Event object
 class Event(db.Model):
     id = sa.Column(sa.Integer, primary_key=True)
-    itemid = sa.Column(sa.BigInteger, sa.ForeignKey(Request.itemid))
+    itemid = sa.Column(sa.BigInteger)
     eventstart = sa.Column(sa.DateTime, nullable=False)
     instcode = sa.Column(sa.ForeignKey(Institution.code))
 
@@ -151,11 +161,11 @@ def get_institution_scalar(code):
 # Validate and submit the add institution form
 def submit_inst_add_form(request):
     if not request.form['code'] or not request.form['name'] or not request.form['key'] or not \
-            request.form['exceptions'] or not request.form['events']:
+            request.form['exceptions'] or not request.form['items'] or not request.form['events']:
         flash('Please enter all the fields', 'error')
     else:
         institution = Institution(request.form['code'], request.form['name'], request.form['key'],
-                                  request.form['exceptions'], request.form['events'])
+                                  request.form['exceptions'], request.form['items'], request.form['events'])
         db.session.add(institution)
         db.session.commit()
         flash('Record was successfully added', 'success')
