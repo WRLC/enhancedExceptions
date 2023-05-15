@@ -79,7 +79,7 @@ class Request(db.Model):
     borcreate = sa.Column(sa.Date, nullable=False)
     title = sa.Column(sa.String(510), nullable=True)
     author = sa.Column(sa.String(255), nullable=True)
-    networknum = sa.Column(sa.BigInteger, nullable=True)
+    networknum = sa.Column(sa.String(255), nullable=True)
     partnerstat = sa.Column(sa.String(255), nullable=False)
     reqsend = sa.Column(sa.DateTime, nullable=True)
     days = sa.Column(sa.Integer, nullable=True)

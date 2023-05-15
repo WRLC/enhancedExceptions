@@ -32,7 +32,7 @@ atexit.register(lambda: scheduler.shutdown())
 
 
 # Background task to update the reports
-@scheduler.task('cron', id='update_reports', minute=42)
+@scheduler.task('cron', id='update_reports', minute=45)
 def update_reports():
     with scheduler.app.app_context():
         schedulers.update_reports()
