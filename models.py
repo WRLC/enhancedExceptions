@@ -175,13 +175,14 @@ def submit_inst_add_form(request):
 # Validate and submit the edit institution form
 def submit_inst_edit_form(request, institution):
     if not request.form['code'] or not request.form['name'] or not request.form['key'] \
-            or not request.form['exceptions'] or not request.form['events']:
+            or not request.form['exceptions'] or not request.form['items'] or not request.form['events']:
         flash('Please enter all the fields', 'error')
     else:
         institution.code = request.form['code']
         institution.name = request.form['name']
         institution.key = request.form['key']
         institution.exceptions = request.form['exceptions']
+        institution.items = request.form['items']
         institution.events = request.form['events']
         db.session.commit()
         flash('Record was successfully updated', 'success')
