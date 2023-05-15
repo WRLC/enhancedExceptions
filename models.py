@@ -30,8 +30,10 @@ class Institution(db.Model):
         requests = db.session.execute(db.select(
             Request.borreqstat, Request.internalid, Request.borcreate, Request.title, Request.author,
             Request.networknum, Request.partnerstat, Request.reqsend, Request.days, Request.requestor,
-            Request.partnername, Request.partnercode, Item.itemid
-        ).join(Item, Item.fulfillmentreqid == Request.fulfillmentreqid, isouter=True).filter(
+            Request.partnername, Request.partnercode, Event.eventstart
+        ).join(Item, Item.fulfillmentreqid == Request.fulfillmentreqid, isouter=True).join(
+            Event, Event.itemid == Item.itemid, isouter=True
+        ).filter(
             Request.instcode == self.code
         ).order_by(
             Request.borreqstat, Request.internalid.desc(), Request.borcreate.desc(), Request.reqsend.desc()
@@ -52,9 +54,9 @@ class Institution(db.Model):
 
     # Construct an item object from a single row in the items report
     def construct_item(self, itrow):
-        fulfillmentreqid = itrow.Column2.get_text()  # Fulfillment request ID
         itemid = itrow.Column1.get_text()  # Item ID
-        itinstance = Item(fulfillmentreqid, itemid, self.code)  # Create a new item object
+        fulfillmentreqid = itrow.Column2.get_text()  # Fulfillment request ID
+        itinstance = Item(itemid, fulfillmentreqid, self.code)  # Create a new item object
 
         return itinstance
 
@@ -70,7 +72,7 @@ class Institution(db.Model):
 # Request object
 class Request(db.Model):
     id = sa.Column(sa.Integer, primary_key=True)
-    fulfillmentreqid = sa.Column(sa.BigInteger, nullable=False)
+    fulfillmentreqid = sa.Column(sa.String(255), nullable=False)
     requestorid = sa.Column(sa.String(255), nullable=False)
     borreqstat = sa.Column(sa.String(255), nullable=False)
     internalid = sa.Column(sa.BigInteger, nullable=False)
@@ -111,7 +113,7 @@ class Request(db.Model):
 class Item(db.Model):
     id = sa.Column(sa.Integer, primary_key=True)
     itemid = sa.Column(sa.BigInteger, nullable=False)
-    fulfillmentreqid = sa.Column(sa.BigInteger, nullable=False)
+    fulfillmentreqid = sa.Column(sa.String(255), nullable=False)
     instcode = sa.Column(sa.ForeignKey(Institution.code))
 
     def __init__(self, itemid, fulfillmentreqid, instcode):
