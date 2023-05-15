@@ -77,7 +77,7 @@ class Request(db.Model):
     borreqstat = sa.Column(sa.String(255), nullable=False)
     internalid = sa.Column(sa.BigInteger, nullable=False)
     borcreate = sa.Column(sa.Date, nullable=False)
-    title = sa.Column(sa.String(255), nullable=False)
+    title = sa.Column(sa.String(510), nullable=False)
     author = sa.Column(sa.String(255), nullable=True)
     networknum = sa.Column(sa.BigInteger, nullable=True)
     partnerstat = sa.Column(sa.String(255), nullable=False)
