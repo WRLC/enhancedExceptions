@@ -52,8 +52,8 @@ class Institution(db.Model):
 
     # Construct an item object from a single row in the items report
     def construct_item(self, itrow):
-        fulfillmentreqid = itrow.Column1.get_text()  # Fulfillment request ID
-        itemid = itrow.Column2.get_text()  # Item ID
+        fulfillmentreqid = itrow.Column2.get_text()  # Fulfillment request ID
+        itemid = itrow.Column1.get_text()  # Item ID
         itinstance = Item(fulfillmentreqid, itemid, self.code)  # Create a new item object
 
         return itinstance
