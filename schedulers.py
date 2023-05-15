@@ -1,5 +1,5 @@
-from models import Request, Event, get_all_institutions
-from utils import database_add, delete_rows, get_rows, get_report
+from models import Request, Item, Event, get_all_institutions
+from utils import database_add, delete_rows, get_report
 
 
 # Update reports for all institutions
@@ -12,6 +12,7 @@ def update_reports():
 
         # Delete all existing requests and events for the institution
         delete_rows(Request, institution.code)
+        delete_rows(Item, institution.code)
         delete_rows(Event, institution.code)
 
         # Requests
