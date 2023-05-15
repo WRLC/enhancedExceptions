@@ -48,7 +48,12 @@ def construct_request_tuple(exrow):
     borreqstat = exrow.Column5.get_text()  # Borrowing request status
     internalid = exrow.Column7.get_text()  # Internal ID
     borcreate = exrow.Column4.get_text()  # Borrowing creation date
-    title = exrow.Column3.get_text()  # Title
+
+    # Check for a title
+    try:
+        title = exrow.Column3.get_text()  # Title
+    except AttributeError:
+        title = None
 
     # Check for an author
     try:
