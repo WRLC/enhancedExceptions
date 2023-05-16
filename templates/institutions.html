@@ -25,7 +25,7 @@
                 {% endfor %}
             </tbody>
         </table>
-        <form action="{{ url_for('add_institution', code=inst.code) }}">
+        <form action="{{ url_for('add_institution') }}">
             <input type="submit" value="Add institution" />
         </form>
 
