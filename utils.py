@@ -60,20 +60,6 @@ def database_add(dbrow):
     db.session.commit()  # Commit the request to the database
 
 
-# Construct a request object from a single row in the exceptions report
-def construct_request_list(exrow):
-
-    request = []
-
-    for key, value in exceptions_map.items():
-        try:
-            request.append(exrow.find(value).get_text())
-        except AttributeError:
-            request.append(None)
-
-    return request
-
-
 # Get all the rows from an analytics report
 def get_report(path, key):
     params = 'analytics/reports?limit=1000&col_names=true&path=' + path + '&apikey=' + key

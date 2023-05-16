@@ -1,6 +1,6 @@
 import sqlalchemy as sa
 from flask import flash, redirect, url_for
-from utils import construct_request_list, db
+from utils import db, exceptions_map
 
 
 ####################
@@ -41,13 +41,14 @@ class Institution(db.Model):
 
     # Construct a request object from a single row in the exceptions report
     def construct_request(self, exrow):
-        request_list = construct_request_list(exrow)
-
-        # Create a new request object
-        exinstance = Request(request_list[0], request_list[1], request_list[2], request_list[3], request_list[4],
-                             request_list[5], request_list[6], request_list[7], request_list[8], request_list[9],
-                             request_list[10], request_list[11], request_list[12], request_list[13],
+        exinstance = Request(None, None, None, None, None, None, None, None, None, None, None, None, None, None,
                              self.code)
+
+        for key, value in exceptions_map.items():
+            try:
+                setattr(exinstance, key, exrow.find(value).get_text())
+            except AttributeError:
+                pass
 
         return exinstance
 
