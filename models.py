@@ -1,6 +1,6 @@
 import sqlalchemy as sa
 from flask import flash, redirect, url_for
-from utils import construct_request_tuple, db
+from utils import construct_request_list, db
 
 
 ####################
@@ -25,7 +25,6 @@ class Institution(db.Model):
         self.events = events
 
     # Get a single institution's requests from the database
-    # TODO: Rewrite this to use item table
     def get_requests(self):
         requests = db.session.execute(db.select(
             Request.borreqstat, Request.internalid, Request.borcreate, Request.title, Request.author,
@@ -42,12 +41,12 @@ class Institution(db.Model):
 
     # Construct a request object from a single row in the exceptions report
     def construct_request(self, exrow):
-        request_tuple = construct_request_tuple(exrow)
+        request_list = construct_request_list(exrow)
 
         # Create a new request object
-        exinstance = Request(request_tuple[0], request_tuple[1], request_tuple[2], request_tuple[3], request_tuple[4],
-                             request_tuple[5], request_tuple[6], request_tuple[7], request_tuple[8], request_tuple[9],
-                             request_tuple[10], request_tuple[11], request_tuple[12], request_tuple[13],
+        exinstance = Request(request_list[0], request_list[1], request_list[2], request_list[3], request_list[4],
+                             request_list[5], request_list[6], request_list[7], request_list[8], request_list[9],
+                             request_list[10], request_list[11], request_list[12], request_list[13],
                              self.code)
 
         return exinstance
@@ -71,21 +70,21 @@ class Institution(db.Model):
 
 # Request object
 class Request(db.Model):
-    id = sa.Column(sa.Integer, primary_key=True)
-    fulfillmentreqid = sa.Column(sa.String(255), nullable=False)
-    requestorid = sa.Column(sa.String(255), nullable=False)
-    borreqstat = sa.Column(sa.String(255), nullable=False)
-    internalid = sa.Column(sa.BigInteger, nullable=False)
-    borcreate = sa.Column(sa.Date, nullable=False)
+    id = sa.Column(sa.BigInteger, primary_key=True)
+    fulfillmentreqid = sa.Column(sa.String(255), nullable=True)
+    requestorid = sa.Column(sa.String(255), nullable=True)
+    borreqstat = sa.Column(sa.String(255), nullable=True)
+    internalid = sa.Column(sa.String(255), nullable=True)
+    borcreate = sa.Column(sa.Date, nullable=True)
     title = sa.Column(sa.String(510), nullable=True)
     author = sa.Column(sa.String(255), nullable=True)
     networknum = sa.Column(sa.String(255), nullable=True)
-    partnerstat = sa.Column(sa.String(255), nullable=False)
+    partnerstat = sa.Column(sa.String(255), nullable=True)
     reqsend = sa.Column(sa.DateTime, nullable=True)
     days = sa.Column(sa.Integer, nullable=True)
-    requestor = sa.Column(sa.String(255), nullable=False)
-    partnername = sa.Column(sa.String(255), nullable=False)
-    partnercode = sa.Column(sa.String(255), nullable=False)
+    requestor = sa.Column(sa.String(255), nullable=True)
+    partnername = sa.Column(sa.String(255), nullable=True)
+    partnercode = sa.Column(sa.String(255), nullable=True)
     instcode = sa.Column(sa.ForeignKey(Institution.code))
 
     def __init__(
@@ -111,8 +110,8 @@ class Request(db.Model):
 
 # Item object
 class Item(db.Model):
-    id = sa.Column(sa.Integer, primary_key=True)
-    itemid = sa.Column(sa.BigInteger, nullable=False)
+    id = sa.Column(sa.BigInteger, primary_key=True)
+    itemid = sa.Column(sa.String(255), nullable=False)
     fulfillmentreqid = sa.Column(sa.String(255), nullable=False)
     instcode = sa.Column(sa.ForeignKey(Institution.code))
 
@@ -124,8 +123,8 @@ class Item(db.Model):
 
 # Event object
 class Event(db.Model):
-    id = sa.Column(sa.Integer, primary_key=True)
-    itemid = sa.Column(sa.BigInteger)
+    id = sa.Column(sa.BigInteger, primary_key=True)
+    itemid = sa.Column(sa.String(255), nullable=False)
     eventstart = sa.Column(sa.DateTime, nullable=False)
     instcode = sa.Column(sa.ForeignKey(Institution.code))
 

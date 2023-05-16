@@ -2,7 +2,26 @@ from bs4 import BeautifulSoup
 from flask_sqlalchemy import SQLAlchemy
 import requests
 
+# Create a database object
 db = SQLAlchemy()
+
+# Map exceptions report columns to database columns
+exceptions_map = {
+    'fulfillmentreqid': 'Column6',  # Fulfillment request ID
+    'requestorid': 'Column14',  # User primary identifier
+    'borreqstat': 'Column5',  # Borrowing request status
+    'internalid': 'Column7',  # Internal ID
+    'borcreate': 'Column4',  # Borrowing creation date
+    'title': 'Column3',  # Title
+    'author': 'Column1',  # Author
+    'networknum': 'Column2',  # Network number
+    'partnerstat': 'Column9',  # Partner status
+    'reqsend': 'Column10',  # Request sending date
+    'days': 'Column15',  # Days in status
+    'requestor': 'Column13',  # Requestor
+    'partnername': 'Column12',  # Partner name
+    'partnercode': 'Column11',  # Partner code
+}
 
 
 # Make an API call to Alma
@@ -42,51 +61,15 @@ def database_add(dbrow):
 
 
 # Construct a request object from a single row in the exceptions report
-def construct_request_tuple(exrow):
-    fulfillmentreqid = exrow.Column6.get_text()  # Fulfillment request ID
-    requestorid = exrow.Column14.get_text()  # User primary identifier
-    borreqstat = exrow.Column5.get_text()  # Borrowing request status
-    internalid = exrow.Column7.get_text()  # Internal ID
-    borcreate = exrow.Column4.get_text()  # Borrowing creation date
+def construct_request_list(exrow):
 
-    # Check for a title
-    try:
-        title = exrow.Column3.get_text()  # Title
-    except AttributeError:
-        title = None
+    request = []
 
-    # Check for an author
-    try:
-        author = exrow.Column1.get_text()  # Author
-    except AttributeError:
-        author = None  # If no author, set to None
-
-    # Check for a network number
-    try:
-        networknum = exrow.Column2.get_text()  # Network number
-    except AttributeError:
-        networknum = None  # If no network number, set to None
-
-    partnerstat = exrow.Column9.get_text()  # Partner active status
-
-    # Check for a request sending date
-    try:
-        reqsend = exrow.Column10.get_text()  # Request sending date
-    except AttributeError:
-        reqsend = None  # If no request sending date, set to None
-
-    # Check for a days since request
-    try:
-        days = exrow.Column15.get_text()  # Days since request
-    except AttributeError:
-        days = None  # If no days since request, set to None
-
-    requestor = exrow.Column13.get_text()  # Requestor
-    partnername = exrow.Column12.get_text()  # Partner name
-    partnercode = exrow.Column11.get_text()  # Partner code
-
-    request = (fulfillmentreqid, requestorid, borreqstat, internalid, borcreate, title, author, networknum, partnerstat,
-               reqsend, days, requestor, partnername, partnercode)
+    for key, value in exceptions_map.items():
+        try:
+            request.append(exrow.find(value).get_text())
+        except AttributeError:
+            request.append(None)
 
     return request
 
