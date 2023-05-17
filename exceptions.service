@@ -1,0 +1,13 @@
+[Unit]
+Description=Gunicorn instance to serve Enhanced Exceptions reports
+After=network.target
+
+[Service]
+User=sammy
+Group=www-data
+WorkingDirectory=/opt/local/enhancedExceptions
+Environment="PATH=/opt/local/enhancedExceptions/venv/bin"
+ExecStart=/opt/local/enhancedExceptions/venv/bin/gunicorn --workers 3 --bind unix:myproject.sock -m 007 wsgi:app
+
+[Install]
+WantedBy=multi-user.target
