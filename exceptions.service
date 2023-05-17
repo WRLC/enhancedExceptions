@@ -2,22 +2,25 @@
 # /etc/systemd/system/exceptions.service
 #
 [Unit]
-Description = Enhanced Exceptions
+Description = enhancedExceptions
 After = network.target
 
 [Service]
 PermissionsStartOnly = true
-PIDFile = /run/exceptions/exceptions.pid
+PIDFile = /run/exceptionss/exceptions.pid
 User = www-data
 Group = www-data
 WorkingDirectory = /opt/local/enhancedExceptions
-ExecStartPre = /bin/mkdir /run/exceptions
-ExecStartPre = /bin/chown -R www-data:www-data /run/exceptions
+ExecStartPre = /bin/mkdir /run/enhancedExceptions
+ExecStartPre = /bin/chown -R www-data:www-data /run/enhancedExceptions
 Environment="PATH=/opt/local/enhancedExceptions/venv/bin"
-ExecStart = /opt/local/enhancedExceptions/venv/bin/gunicorn -b 127.0.0.1:8003 wsgi:app --pid /run/exceptions/exceptions.pid --error-logfile /opt/local/enhancedExceptions/log/gunicorn.log
+# https://docs.gunicorn.org/en/stable/settings.html
+ExecStart = /opt/local/enhancedExceptions/venv/bin/gunicorn -b 127.0.0.1:5001 wsgi:app \
+    --pid /run/enhancedExceptions/enhancedExceptions \
+    --error-logfile /opt/local/enhancedExceptions/log/gunicorn.log --log-level 'warning'
 ExecReload = /bin/kill -s HUP $MAINPID
 ExecStop = /bin/kill -s TERM $MAINPID
-ExecStopPost = /bin/rm -rf /run/enhancedexceptions
+ExecStopPost = /bin/rm -rf /run/enhancedExceptions
 PrivateTmp = true
 
 [Install]
