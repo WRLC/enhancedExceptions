@@ -3,7 +3,7 @@ Description=Gunicorn instance to serve Enhanced Exceptions reports
 After=network.target
 
 [Service]
-User=sammy
+User=www-data
 Group=www-data
 WorkingDirectory=/opt/local/enhancedExceptions
 Environment="PATH=/opt/local/enhancedExceptions/venv/bin"
