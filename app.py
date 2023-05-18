@@ -96,6 +96,7 @@ def logout():
 
 # List of reports page
 @app.route('/reports')
+@auth_required
 def reports():
     # Get the list of institutions
     insts = get_all_institutions()
@@ -105,6 +106,7 @@ def reports():
 
 # Report page
 @app.route('/reports/<code>')
+@auth_required
 def report(code):
     inst = get_institution_scalar(code)
     requests = Institution.get_requests(inst)
@@ -113,12 +115,14 @@ def report(code):
 
 # Admin page
 @app.route('/admin')
+@auth_required
 def admin():
     return render_template('admin.html')
 
 
 # Institutions admin page
 @app.route('/admin/institutions')
+@auth_required
 def admin_institutions():
     # Get the list of institutions
     insts = get_all_institutions()
@@ -127,6 +131,7 @@ def admin_institutions():
 
 # Create a new institution
 @app.route('/admin/institutions/add', methods=['GET', 'POST'])
+@auth_required
 def add_institution():
     if request.method == 'POST':
         submit_inst_add_form(request)
@@ -135,6 +140,7 @@ def add_institution():
 
 # Detail page for a single institution
 @app.route('/admin/institutions/<code>')
+@auth_required
 def institution_detail(code):
     # Get the institution object
     institution = get_institution(code)
@@ -143,6 +149,7 @@ def institution_detail(code):
 
 # Edit page for a single institution
 @app.route('/admin/institutions/<code>/edit', methods=['GET', 'POST'])
+@auth_required
 def institution_edit(code):
     # Get the institution object
     institution = get_institution(code)
