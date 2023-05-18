@@ -81,6 +81,7 @@ def new_login():
         session['username'] = user_data['primary_id']
         session['user_home'] = user_data['inst']
         session['display_name'] = user_data['full_name']
+        session['authorizations'] = user_data['authorizations']
         return redirect(url_for('index'))
     else:
         return "no login cookie"

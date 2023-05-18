@@ -38,8 +38,17 @@
         {% endwith %}
     </div>
 
-    <div class="content">
+    <div class="container">
         {% block content %} {% endblock %}
+        {% if 'username' in session %}
+            <div><span class="text-muted">Logged in as: {{ session['display_name'] }}</span></div>
+        {% endif %}
+        {% if 'user_home' in session %}
+            <div><span class="text-muted">Institution: {{ session['user_home'] }}</span></div>
+        {% endif %}
+        {% if 'authorizations' in session %}
+            <div><span class="text-muted">Authorizations: {{ session['authorizations'] }}</span></div>
+        {% endif %}
     </div>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"
             integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
