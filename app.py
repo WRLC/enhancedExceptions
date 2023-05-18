@@ -1,4 +1,4 @@
-from settings import database
+from settings import database, shared_secret
 from flask import Flask, render_template, request, redirect, url_for, session
 from models import (
     Institution, get_all_institutions, submit_inst_add_form, submit_inst_edit_form, get_institution_scalar,
@@ -17,6 +17,7 @@ import sys
 app = Flask(__name__)
 app.config['SCHEDULER_API_ENABLED'] = True
 app.config['SESSION_KEY'] = os.urandom(24)
+app.config['SHARED_SECRET'] = shared_secret
 app.config['SQLALCHEMY_DATABASE_URI'] = database
 app.secret_key = app.config['SESSION_KEY']
 db.init_app(app)
@@ -76,7 +77,7 @@ def new_login():
         print(cookie, file=sys.stderr)
     if 'wrt' in request.cookies:
         encoded_token = request.cookies['wrt']
-        user_data = jwt.decode(encoded_token, app.secret_key, algorithms=['HS256'])
+        user_data = jwt.decode(encoded_token, app.config['SHARED_SECERT'], algorithms=['HS256'])
         session['username'] = user_data['primary_id']
         session['user_home'] = user_data['inst']
         session['display_name'] = user_data['full_name']
