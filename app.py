@@ -77,7 +77,7 @@ def new_login():
         print(cookie, file=sys.stderr)
     if 'wrt' in request.cookies:
         encoded_token = request.cookies['wrt']
-        user_data = jwt.decode(encoded_token, app.config['SHARED_SECERT'], algorithms=['HS256'])
+        user_data = jwt.decode(encoded_token, app.config['SHARED_SECRET'], algorithms=['HS256'])
         session['username'] = user_data['primary_id']
         session['user_home'] = user_data['inst']
         session['display_name'] = user_data['full_name']
