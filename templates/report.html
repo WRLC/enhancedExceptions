@@ -11,10 +11,10 @@
                 <th>Title</th>
                 <th>Author</th>
                 <th>Network Number</th>
+                <th>Requestor</th>
                 <th>Partner Active Status</th>
                 <th>Request Sending Date</th>
                 <th>Days Since Request</th>
-                <th>Requestor</th>
                 <th>Partner Name</th>
                 <th>Partner Code</th>
                 <th>In Transit?</th>
@@ -34,6 +34,7 @@
                     {% else %}
                         <td></td>
                     {% endif %}
+                    <td>{{ request.requestor }}</td>
                     <td>{{ request.partnerstat }}</td>
                     {% if request.reqsend %}
                         <td>{{ request.reqsend }}</td>
@@ -42,7 +43,6 @@
                         <td></td>
                         <td></td>
                     {% endif %}
-                    <td>{{ request.requestor }}</td>
                     <td>{{ request.partnername }}</td>
                     <td>{{ request.partnercode }}</td>
                     {% if request.eventstart %}
@@ -126,6 +126,19 @@
                     dbRows[i].cells[5].style.display = "none";
                 } else {
                     dbRows[i].cells[5].style.display = "table-cell";
+                    lastValue = thisValue;
+                    lastCounter = 1;
+                    lastRow = i;
+                }
+            }
+            for (let i = 0; i < dbRows.length; i++) {
+                let thisValue = dbRows[i].cells[6].innerHTML;
+                if (thisValue == lastValue) {
+                    lastCounter++;
+                    dbRows[lastRow].cells[6].rowSpan = lastCounter;
+                    dbRows[i].cells[6].style.display = "none";
+                } else {
+                    dbRows[i].cells[6].style.display = "table-cell";
                     lastValue = thisValue;
                     lastCounter = 1;
                     lastRow = i;
