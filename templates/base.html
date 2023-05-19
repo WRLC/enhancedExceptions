@@ -17,9 +17,11 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('reports') }}">Reports</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('admin') }}">Admin</a>
-                    </li>
+                    { if session['user_home'] == 'scf' }
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin') }}">Admin</a>
+                        </li>
+                    {% endif %}
                     <li class="navbar-text">&nbsp;&nbsp;&nbsp;&nbsp;</li>
                     <li class="navbar-header">
                         <a class="navbar-brand" href="#">WRLC Request Status Exceptions</a>
@@ -41,13 +43,12 @@
     <div class="container">
         {% block content %} {% endblock %}
         {% if 'username' in session %}
-            <div><span class="text-muted">Logged in as: {{ session['display_name'] }}</span></div>
+            <div>
+                <span class="text-muted">Logged in as: {{ session['display_name'] }} ({{ session['username'] }})</span>
+            </div>
         {% endif %}
         {% if 'user_home' in session %}
             <div><span class="text-muted">Institution: {{ session['user_home'] }}</span></div>
-        {% endif %}
-        {% if 'authorizations' in session %}
-            <div><span class="text-muted">Authorizations: {{ session['authorizations'] }}</span></div>
         {% endif %}
     </div>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"

@@ -49,6 +49,8 @@ def auth_required(f):
         if 'username' not in session:
             return redirect(url_for('login'))
         else:
+            if 'admin' in session['authorizations']:
+                session['admin'] = True
             return f(*args, **kwargs)
 
     return decorated
@@ -81,7 +83,6 @@ def new_login():
         session['username'] = user_data['primary_id']
         session['user_home'] = user_data['inst']
         session['display_name'] = user_data['full_name']
-        session['authorizations'] = user_data['authorizations']
         return redirect(url_for('index'))
     else:
         return "no login cookie"
@@ -117,6 +118,8 @@ def report(code):
 @app.route('/admin')
 @auth_required
 def admin():
+    if session['user_home'] != 'scf':
+        return redirect(url_for('index'))
     return render_template('admin.html')
 
 
@@ -124,6 +127,9 @@ def admin():
 @app.route('/admin/institutions')
 @auth_required
 def admin_institutions():
+    if session['user_home'] != 'scf':
+        return redirect(url_for('index'))
+
     # Get the list of institutions
     insts = get_all_institutions()
     return render_template('institutions.html', institutions=insts)
@@ -133,6 +139,8 @@ def admin_institutions():
 @app.route('/admin/institutions/add', methods=['GET', 'POST'])
 @auth_required
 def add_institution():
+    if session['user_home'] != 'scf':
+        return redirect(url_for('index'))
     if request.method == 'POST':
         submit_inst_add_form(request)
     return render_template('create_inst.html')
@@ -142,6 +150,9 @@ def add_institution():
 @app.route('/admin/institutions/<code>')
 @auth_required
 def institution_detail(code):
+    if session['user_home'] != 'scf':
+        return redirect(url_for('index'))
+
     # Get the institution object
     institution = get_institution(code)
     return render_template('institution.html', inst=institution)
@@ -151,6 +162,9 @@ def institution_detail(code):
 @app.route('/admin/institutions/<code>/edit', methods=['GET', 'POST'])
 @auth_required
 def institution_edit(code):
+    if session['user_home'] != 'scf':
+        return redirect(url_for('index'))
+
     # Get the institution object
     institution = get_institution(code)
 
