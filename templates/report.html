@@ -2,10 +2,7 @@
 
 {% block content %}
     <h1>{{ inst.name }}</h1>
-    <script>
-        window.onload = mergeCells()
-    </script>
-    <table class="table table-bordered table-hover table-sm" id="reportbody">
+    <table class="table table-bordered table-hover table-sm" id="reportbody" onload="return mergeCells()">
         <thead class="thead-dark">
             <tr>
                 <th>Borrowing Request Status</th>
