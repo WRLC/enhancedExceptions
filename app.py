@@ -49,8 +49,6 @@ def auth_required(f):
         if 'username' not in session:
             return redirect(url_for('login'))
         else:
-            if 'admin' in session['authorizations']:
-                session['admin'] = True
             return f(*args, **kwargs)
 
     return decorated
