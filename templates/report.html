@@ -4,7 +4,7 @@
     <h1>{{ inst.name }}</h1>
     <table class="table table-bordered table-hover table-sm" id="reportbody">
         <thead class="thead-dark">
-            <tr>
+            <tr class="position-sticky">
                 <th>Borrowing Request Status</th>
                 <th>Internal ID</th>
                 <th>Borrowing Request Date</th>
@@ -89,7 +89,60 @@
                     lastRow = i;
                 }
             }
+            for (let i = 0; i < dbRows.length; i++) {
+                let thisValue = dbRows[i].cells[2].innerHTML;
+                if (thisValue == lastValue) {
+                    lastCounter++;
+                    dbRows[lastRow].cells[2].rowSpan = lastCounter;
+                    dbRows[i].cells[2].style.display = "none";
+                } else {
+                    dbRows[i].cells[2].style.display = "table-cell";
+                    lastValue = thisValue;
+                    lastCounter = 1;
+                    lastRow = i;
+                }
+            }
+            for (let i = 0; i < dbRows.length; i++) {
+                let thisValue = dbRows[i].cells[3].innerHTML;
+                if (thisValue == lastValue) {
+                    lastCounter++;
+                    dbRows[lastRow].cells[3].rowSpan = lastCounter;
+                    dbRows[i].cells[3].style.display = "none";
+                } else {
+                    dbRows[i].cells[3].style.display = "table-cell";
+                    lastValue = thisValue;
+                    lastCounter = 1;
+                    lastRow = i;
+                }
+            }
+            for (let i = 0; i < dbRows.length; i++) {
+                let thisValue = dbRows[i].cells[4].innerHTML;
+                if (thisValue == lastValue) {
+                    lastCounter++;
+                    dbRows[lastRow].cells[4].rowSpan = lastCounter;
+                    dbRows[i].cells[4].style.display = "none";
+                } else {
+                    dbRows[i].cells[4].style.display = "table-cell";
+                    lastValue = thisValue;
+                    lastCounter = 1;
+                    lastRow = i;
+                }
+            }
+            for (let i = 0; i < dbRows.length; i++) {
+                let thisValue = dbRows[i].cells[5].innerHTML;
+                if (thisValue == lastValue) {
+                    lastCounter++;
+                    dbRows[lastRow].cells[5].rowSpan = lastCounter;
+                    dbRows[i].cells[5].style.display = "none";
+                } else {
+                    dbRows[i].cells[5].style.display = "table-cell";
+                    lastValue = thisValue;
+                    lastCounter = 1;
+                    lastRow = i;
+                }
+            }
         }
+
 
     </script>
 {% endblock %}
