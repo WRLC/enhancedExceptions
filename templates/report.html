@@ -76,6 +76,19 @@
                     lastRow = i;
                 }
             }
+            for (let i = 0; i < dbRows.length; i++) {
+                let thisValue = dbRows[i].cells[1].innerHTML;
+                if (thisValue == lastValue) {
+                    lastCounter++;
+                    dbRows[lastRow].cells[1].rowSpan = lastCounter;
+                    dbRows[i].cells[1].style.display = "none";
+                } else {
+                    dbRows[i].cells[1].style.display = "table-cell";
+                    lastValue = thisValue;
+                    lastCounter = 1;
+                    lastRow = i;
+                }
+            }
         }
 
     </script>
