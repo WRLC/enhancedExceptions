@@ -3,8 +3,8 @@
 {% block content %}
     <h1>{{ inst.name }}</h1>
     <table class="table table-bordered table-hover table-sm" id="reportbody">
-        <thead class="thead-dark">
-            <tr class="position-sticky">
+        <thead class="thead-dark sticky-top">
+            <tr>
                 <th>Borrowing Request Status</th>
                 <th>Internal ID</th>
                 <th>Borrowing Request Date</th>
@@ -63,19 +63,6 @@
             let lastValue = "";
             let lastCounter = 1;
             let lastRow = 0;
-            for (let i = 0; i < dbRows.length; i++) {
-                let thisValue = dbRows[i].cells[0].innerHTML;
-                if (thisValue == lastValue) {
-                    lastCounter++;
-                    dbRows[lastRow].cells[0].rowSpan = lastCounter;
-                    dbRows[i].cells[0].style.display = "none";
-                } else {
-                    dbRows[i].cells[0].style.display = "table-cell";
-                    lastValue = thisValue;
-                    lastCounter = 1;
-                    lastRow = i;
-                }
-            }
             for (let i = 0; i < dbRows.length; i++) {
                 let thisValue = dbRows[i].cells[1].innerHTML;
                 if (thisValue == lastValue) {
