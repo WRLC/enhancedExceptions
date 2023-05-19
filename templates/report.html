@@ -2,7 +2,7 @@
 
 {% block content %}
     <h1>{{ inst.name }}</h1>
-    <table class="table table-bordered table-hover table-sm" id="reportbody" onload="return mergeCells()">
+    <table class="table table-bordered table-hover table-sm" id="reportbody">
         <thead class="thead-dark">
             <tr>
                 <th>Borrowing Request Status</th>
@@ -56,4 +56,5 @@
             {% endfor %}
         </tbody>
     </table>
+    <style onload="mergeCells()"></style>
 {% endblock %}
