@@ -65,7 +65,7 @@
             let lastRow = 0;
             for (let i = 0; i < dbRows.length; i++) {
                 let thisValue = dbRows[i].cells[1].innerHTML;
-                if (thisValue == lastValue) {
+                if (thisValue === lastValue) {
                     lastCounter++;
                     dbRows[lastRow].cells[0].rowSpan = lastCounter;
                     dbRows[lastRow].cells[1].rowSpan = lastCounter;
