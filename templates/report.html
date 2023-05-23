@@ -2,6 +2,9 @@
 
 {% block content %}
     <h2>{{ inst.name }}</h2>
+    {% if requests|length == 0 %}
+        <p>No requests found.</p>
+    {% endif %}
     {% for reqs in requests %}
         <details class="collapsible-report">
             <summary>
