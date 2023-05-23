@@ -5,7 +5,11 @@
     {% for reqs in requests %}
         <details class="collapsible-report">
             <summary>
-                {{ reqs[0].borreqstat }} ({{ reqs|length }})
+                {% set slots = [] %}
+                {% for req in reqs if req.borreqstat not in slots %}
+                    {% do slots.append(reg.borreqstat) %}
+                {% endfor %}
+                {{ reqs[0].borreqstat }} ({{ slots|length }})
             </summary>
             <table class="table table-bordered table-hover table-sm report" id="{{ reqs[0].borreqstat|replace(' ', '') }}">
                 <thead class="table-dark sticky-top">
