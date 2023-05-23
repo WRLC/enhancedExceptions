@@ -7,7 +7,7 @@
             <summary>
                 {% set slots = [] %}
                 {% for req in reqs if req.borreqstat not in slots %}
-                    {% do slots.append(reg.borreqstat) %}
+                    {% slots.append(reg.borreqstat) %}
                 {% endfor %}
                 {{ reqs[0].borreqstat }} ({{ slots|length }})
             </summary>
