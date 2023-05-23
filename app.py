@@ -2,8 +2,9 @@ from settings import database, shared_secret, admins
 from flask import Flask, render_template, request, redirect, url_for, session
 from models import (
     Institution, get_all_institutions, submit_inst_add_form, submit_inst_edit_form, get_institution_scalar,
-    get_institution
+    get_institution, check_user, User
 )
+from sqlalchemy import exists
 from utils import db
 from functools import wraps
 import schedulers
@@ -12,6 +13,7 @@ import jwt
 from flask_apscheduler import APScheduler
 import atexit
 import sys
+from datetime import datetime
 
 # create app
 app = Flask(__name__)
@@ -84,8 +86,31 @@ def new_login():
         session['user_home'] = user_data['inst']
         session['display_name'] = user_data['full_name']
         session['authorizations'] = user_data['authorizations']
-        if session['username'] in admins:
-            session['authorizations'].append('admin')
+
+        # Check if the user exists in the database
+        user = check_user(session['username'])
+
+        # If the user exists in the database...
+        if user is not None:
+            # ...update their last login time
+            user.last_login = datetime.now()
+            db.session.commit()
+
+            # ...check if the user is an admin
+            if user['admin'] is True:
+                session['authorizations'].append('admin')
+        else:
+            # If the user does not exist in the database, add them
+            if session['username'] in admins:  # Check if the user is an admin
+                admincheck = True  # If they are, set admincheck to True
+            else:
+                admincheck = False  # If they are not, set admincheck to False
+
+            # Add the user to the database
+            user = User(session['username'], session['display_name'], session['user_home'], admincheck, datetime.now())
+            db.session.add(user)
+            db.session.commit()
+
         return redirect(url_for('index'))
     else:
         return "no login cookie"

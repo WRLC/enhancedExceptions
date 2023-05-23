@@ -147,6 +147,22 @@ class Event(db.Model):
         self.instcode = instcode
 
 
+class User(db.Model):
+    id = sa.Column(sa.Integer, primary_key=True)
+    username = sa.Column(sa.String(255), nullable=False)
+    displayname = sa.Column(sa.String(255), nullable=True)
+    instcode = sa.Column(sa.ForeignKey(Institution.code))
+    admin = sa.Column(sa.Boolean, nullable=False)
+    last_login = sa.Column(sa.DateTime, nullable=True)
+
+    def __init__(self, username, displayname, instcode, admin, last_login):
+        self.username = username
+        self.displayname = displayname
+        self.instcode = instcode
+        self.admin = admin
+        self.last_login = last_login
+
+
 ####################
 #  Helper Methods  #
 ####################
@@ -201,3 +217,8 @@ def submit_inst_edit_form(request, institution):
         db.session.commit()
         flash('Record was successfully updated', 'success')
         return redirect(url_for('institution_detail', code=institution.code))
+
+
+def check_user(username):
+    user = db.session.execute(db.select(User).filter(User.username == username)).scalar_one_or_none()
+    return user
