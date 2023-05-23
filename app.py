@@ -97,7 +97,7 @@ def new_login():
             db.session.commit()
 
             # ...check if the user is an admin
-            if user['admin'] is True:
+            if user.admin is True:
                 session['authorizations'].append('admin')
         else:
             # If the user does not exist in the database, add them
