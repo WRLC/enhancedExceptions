@@ -11,8 +11,8 @@ function submitLogin() {
 }
 
 // merge cells in report
-function mergeCells() {
-    let db = document.getElementById("reportbody");
+function mergeCells(status) {
+    let db = document.getElementById(status);
     let dbRows = db.rows;
     let lastValue = "";
     let lastCounter = 1;

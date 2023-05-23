@@ -58,8 +58,10 @@ def auth_required(f):
 @app.route('/')
 @auth_required
 def index():
+    # Get the list of institutions
+    insts = get_all_institutions()
 
-    return render_template('index.html')
+    return render_template('reports.html', institutions=insts)
 
 
 @app.route('/login')
@@ -96,23 +98,17 @@ def logout():
     return redirect(url_for('index'))
 
 
-# List of reports page
-@app.route('/reports')
-@auth_required
-def reports():
-    # Get the list of institutions
-    insts = get_all_institutions()
-
-    return render_template('reports.html', institutions=insts)
-
-
 # Report page
-@app.route('/reports/<code>')
+@app.route('/<code>')
 @auth_required
 def report(code):
     inst = get_institution_scalar(code)
-    requests = Institution.get_requests(inst)
-    return render_template('report.html', requests=requests, inst=inst)
+    statuses = Institution.get_statuses(inst)
+    requests = []
+    for status in statuses:
+        reqs = Institution.get_requests(inst, status[0])
+        requests.append(reqs)
+    return render_template('report.html', requests=requests, inst=inst, statuses=statuses)
 
 
 # Admin page

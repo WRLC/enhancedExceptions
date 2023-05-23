@@ -25,7 +25,7 @@ class Institution(db.Model):
         self.events = events
 
     # Get a single institution's requests from the database
-    def get_requests(self):
+    def get_requests(self, status):
         requests = db.session.execute(db.select(
             Request.borreqstat, Request.internalid, Request.borcreate, Request.title, Request.author,
             Request.networknum, Request.partnerstat, Request.reqsend, Request.days, Request.requestor,
@@ -33,11 +33,23 @@ class Institution(db.Model):
         ).join(Item, Item.fulfillmentreqid == Request.fulfillmentreqid, isouter=True).join(
             Event, Event.itemid == Item.itemid, isouter=True
         ).filter(
-            Request.instcode == self.code
+            Request.instcode == self.code,
+            Request.borreqstat == status
         ).order_by(
             Request.borreqstat, Request.internalid.desc(), Request.borcreate.desc(), Request.reqsend.desc()
         )).all()
         return requests
+
+    # Get a single institution's borrowing request statuses from the database
+    def get_statuses(self):
+        statuses = db.session.execute(db.select(
+            Request.borreqstat, sa.func.count(Request.borreqstat)
+        ).filter(
+            Request.instcode == self.code
+        ).group_by(
+            Request.borreqstat
+        )).all()
+        return statuses
 
     # Construct a request object from a single row in the exceptions report
     def construct_request(self, exrow):

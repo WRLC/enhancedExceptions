@@ -1,60 +1,76 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>{{ inst.name }}</h1>
-    <table class="table table-bordered table-hover table-sm" id="reportbody">
-        <thead class="thead-dark sticky-top">
-            <tr>
-                <th>Borrowing Request Status</th>
-                <th>Internal ID</th>
-                <th>Borrowing Request Date</th>
-                <th>Title</th>
-                <th>Author</th>
-                <th>Network Number</th>
-                <th>Requestor</th>
-                <th>Partner Active Status</th>
-                <th>Request Sending Date</th>
-                <th>Days Since Request</th>
-                <th>Partner Name</th>
-                <th>Partner Code</th>
-                <th>In Transit?</th>
-                <th>In Transit Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for request in requests %}
-                <tr>
-                    <td>{{ request.borreqstat }}</td>
-                    <td>{{ request.internalid }}</td>
-                    <td>{{ request.borcreate }}</td>
-                    <td>{{ request.title }}</td>
-                    <td>{{ request.author }}</td>
-                    {% if request.networknum %}
-                        <td>{{ request.networknum }}</td>
-                    {% else %}
-                        <td></td>
-                    {% endif %}
-                    <td>{{ request.requestor }}</td>
-                    <td>{{ request.partnerstat }}</td>
-                    {% if request.reqsend %}
-                        <td>{{ request.reqsend }}</td>
-                        <td>{{ request.days }}</td>
-                    {% else %}
-                        <td></td>
-                        <td></td>
-                    {% endif %}
-                    <td>{{ request.partnername }}</td>
-                    <td>{{ request.partnercode }}</td>
-                    {% if request.eventstart %}
-                        <td>Y</td>
-                        <td>{{ request.eventstart }}</td>
-                    {% else %}
-                        <td>N</td>
-                        <td></td>
-                    {% endif %}
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <script>window.onload = function() { mergeCells(); }</script>
+    <h2>{{ inst.name }}</h2>
+    {% for reqs in requests %}
+        <details class="collapsible-report">
+            <summary>
+                {{ reqs[0].borreqstat }} ({{ reqs|length }})
+            </summary>
+            <table class="table table-bordered table-hover table-sm report" id="{{ reqs[0].borreqstat|replace(' ', '') }}">
+                <thead class="table-dark sticky-top">
+                    <tr>
+                        <th>Borrowing Request Status</th>
+                        <th>Internal ID</th>
+                        <th>Borrowing Request Date</th>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Network Number</th>
+                        <th>Requestor</th>
+                        <th>Partner Active Status</th>
+                        <th>Request Sending Date</th>
+                        <th>Days Since Request</th>
+                        <th>Partner Name</th>
+                        <th>Partner Code</th>
+                        <th>In Transit?</th>
+                        <th>In Transit Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for request in reqs %}
+                        <tr>
+                            <td>{{ request.borreqstat }}</td>
+                            <td>{{ request.internalid }}</td>
+                            <td>{{ request.borcreate }}</td>
+                            <td>{{ request.title }}</td>
+                            <td>{{ request.author }}</td>
+                            {% if request.networknum %}
+                                <td>{{ request.networknum }}</td>
+                            {% else %}
+                                <td></td>
+                            {% endif %}
+                            <td>{{ request.requestor }}</td>
+                            <td>{{ request.partnerstat }}</td>
+                            {% if request.reqsend %}
+                                <td>{{ request.reqsend }}</td>
+                                <td>{{ request.days }}</td>
+                            {% else %}
+                                <td></td>
+                                <td></td>
+                            {% endif %}
+                            <td>{{ request.partnername }}</td>
+                            <td>{{ request.partnercode }}</td>
+                            {% if request.eventstart %}
+                                <td>Y</td>
+                                <td>{{ request.eventstart }}</td>
+                            {% else %}
+                                <td>N</td>
+                                <td></td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </details>
+    {% endfor %}
+    <script>
+        window.onload = function() {
+            const tables = document.getElementsByClassName("report");
+            if (tables.length > 0) {
+                for (let table of tables) {
+                    mergeCells(table.id);
+                }
+            }
+        };
+    </script>
 {% endblock %}
