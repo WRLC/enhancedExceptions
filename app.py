@@ -195,5 +195,17 @@ def institution_edit(code):
     return render_template('edit_inst.html', inst=institution)
 
 
+# Admin page for users
+@app.route('/admin/users')
+@auth_required
+def admin_users():
+    if 'admin' not in session['authorizations']:
+        return redirect(url_for('index'))
+
+    # Get the list of users
+    users = db.session.execute(db.select(User).order_by(User.last_login.desc())).scalars()
+    return render_template('users.html', users=users)
+
+
 if __name__ == '__main__':
     app.run()
