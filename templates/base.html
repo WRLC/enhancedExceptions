@@ -11,10 +11,10 @@
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
             <div class="collapse navbar-collapse" id="navbarText">
                 <ul class="navbar-nav mr-auto">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="{{ url_for('index') }}">Home</a>
-                    </li>
-                    {% if session['user_home'] == 'scf' %}
+                    {% if 'admin' in session['authorizations'] %}
+                        <li class="nav-item active">
+                            <a class="nav-link" href="{{ url_for('index') }}">Reports</a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('admin') }}">Admin</a>
                         </li>

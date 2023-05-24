@@ -1,6 +1,8 @@
 import sqlalchemy as sa
 from flask import flash, redirect, url_for
 from utils import db, exceptions_map
+from datetime import datetime
+from settings import admins
 
 
 ####################
@@ -222,3 +224,44 @@ def submit_inst_edit_form(request, institution):
 def check_user(username):
     user = db.session.execute(db.select(User).filter(User.username == username)).scalar_one_or_none()
     return user
+
+
+def set_last_login(user):
+    user.last_login = datetime.now()
+    db.session.commit()
+
+
+def set_user_admin(user, session):
+    if user.admin is True:
+        session['authorizations'].append('admin')
+
+
+def admincheck_user(session):
+    # If the user does not exist in the database, add them
+    if session['username'] in admins:  # Check if the user is an admin
+        admincheck = True  # If they are, set admincheck to True
+    else:
+        admincheck = False  # If they are not, set admincheck to False
+
+    return admincheck
+
+
+def add_user(session, admincheck):
+    user = User(session['username'], session['display_name'], session['user_home'], admincheck, datetime.now())
+    db.session.add(user)
+    db.session.commit()
+
+
+def user_login(session):
+    # Check if the user exists in the database
+    user = check_user(session['username'])
+
+    # If the user exists in the database...
+    if user is not None:
+        set_last_login(user)
+        set_user_admin(user, session)
+    else:
+        admincheck = admincheck_user(session)
+
+        # Add the user to the database
+        add_user(session, admincheck)

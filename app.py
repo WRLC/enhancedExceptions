@@ -1,10 +1,9 @@
-from settings import database, shared_secret, admins
+from settings import database, shared_secret
 from flask import Flask, render_template, request, redirect, url_for, session
 from models import (
     Institution, get_all_institutions, submit_inst_add_form, submit_inst_edit_form, get_institution_scalar,
-    get_institution, check_user, User
+    get_institution, User, user_login
 )
-from sqlalchemy import exists
 from utils import db
 from functools import wraps
 import schedulers
@@ -12,8 +11,6 @@ import os
 import jwt
 from flask_apscheduler import APScheduler
 import atexit
-import sys
-from datetime import datetime
 
 # create app
 app = Flask(__name__)
@@ -60,6 +57,11 @@ def auth_required(f):
 @app.route('/')
 @auth_required
 def index():
+    # Check if the user is an admin
+    if 'admin' not in session['authorizations']:
+        # If not, redirect to the reports page for their institution
+        return redirect(url_for('report'), code=session['user_home'])
+
     # Get the list of institutions
     insts = get_all_institutions()
 
@@ -77,8 +79,6 @@ def login():
 @app.route('/login/n', methods=['GET'])
 def new_login():
     session.clear()
-    for cookie in request.cookies:
-        print(cookie, file=sys.stderr)
     if 'wrt' in request.cookies:
         encoded_token = request.cookies['wrt']
         user_data = jwt.decode(encoded_token, app.config['SHARED_SECRET'], algorithms=['HS256'])
@@ -87,29 +87,7 @@ def new_login():
         session['display_name'] = user_data['full_name']
         session['authorizations'] = user_data['authorizations']
 
-        # Check if the user exists in the database
-        user = check_user(session['username'])
-
-        # If the user exists in the database...
-        if user is not None:
-            # ...update their last login time
-            user.last_login = datetime.now()
-            db.session.commit()
-
-            # ...check if the user is an admin
-            if user.admin is True:
-                session['authorizations'].append('admin')
-        else:
-            # If the user does not exist in the database, add them
-            if session['username'] in admins:  # Check if the user is an admin
-                admincheck = True  # If they are, set admincheck to True
-            else:
-                admincheck = False  # If they are not, set admincheck to False
-
-            # Add the user to the database
-            user = User(session['username'], session['display_name'], session['user_home'], admincheck, datetime.now())
-            db.session.add(user)
-            db.session.commit()
+        user_login(session)
 
         return redirect(url_for('index'))
     else:
