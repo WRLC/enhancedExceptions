@@ -50,7 +50,7 @@
         {% block content %} {% endblock %}
         {% if 'username' in session %}
             <div>
-                <span class="text-muted">Logged in as: {{ session['display_name'] }} ({{ session['username'] }})</span>
+                <span class="text-muted">Logged in as: {{ session['display_name'] }}</span>
             </div>
         {% endif %}
         {% if 'user_home' in session %}

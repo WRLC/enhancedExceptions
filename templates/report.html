@@ -2,7 +2,7 @@
 
 {% block content %}
     <h2>{{ inst.name }}</h2>
-    <p><small>Last Updated: {{ update.last_update }}</small></p>
+    <div><span class="text-muted">Last Updated: {{ update.last_update }}</span></div>
     {% if requests|length == 0 %}
         <p>No requests found.</p>
     {% endif %}
