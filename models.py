@@ -299,6 +299,6 @@ def add_update(instcode, last_update):
 
 def get_last_update(instcode):
     update = db.session.execute(
-        db.select(Inst_update).filter(instcode == instcode).order_by(sa.desc(
+        db.select(Inst_update).filter(Inst_update.instcode == instcode).order_by(sa.desc(
             Inst_update.last_update))).first()
     return update
