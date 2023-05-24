@@ -13,3 +13,12 @@
 .collapsible-report[open] summary {
     border-radius: 4px 4px 0 0;
 }
+
+.field {
+    margin-bottom: 10px;
+}
+
+.field .field-name {
+    font-weight: 600;
+    margin-bottom: 5px;
+}

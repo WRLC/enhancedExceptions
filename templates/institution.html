@@ -23,6 +23,6 @@
         <div class="field-value">{{ inst.events }}</div>
     </div>
     <form action="{{ url_for('institution_edit', code=inst.code) }}">
-        <input type="submit" value="Edit institution" />
+        <input type="submit" value="Edit institution" class="btn btn-primary" />
     </form>
 {% endblock %}
