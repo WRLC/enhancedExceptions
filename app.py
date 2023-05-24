@@ -2,7 +2,7 @@ from settings import database, shared_secret
 from flask import Flask, render_template, request, redirect, url_for, session
 from models import (
     Institution, get_all_institutions, submit_inst_add_form, submit_inst_edit_form, get_institution_scalar,
-    get_institution, User, user_login
+    get_institution, User, user_login, get_last_update
 )
 from utils import db
 from functools import wraps
@@ -101,11 +101,12 @@ def logout():
 def report(code):
     inst = get_institution_scalar(code)
     statuses = Institution.get_statuses(inst)
+    last_update = get_last_update(code)
     requests = []
     for status in statuses:
         reqs = Institution.get_requests(inst, status[0])
         requests.append(reqs)
-    return render_template('report.html', requests=requests, inst=inst, statuses=statuses)
+    return render_template('report.html', requests=requests, inst=inst, statuses=statuses, update=last_update)
 
 
 # Admin page

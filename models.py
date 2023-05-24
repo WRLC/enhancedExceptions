@@ -196,12 +196,7 @@ def get_institution(code):
 
 # Get a single institution from the database as a scalar
 def get_institution_scalar(code):
-    inst = db.session.execute(
-        db.select(Institution, Inst_update).filter(
-            Institution.code == code).join(
-            Inst_update, Institution.code == Inst_update.instcode, isouter=True).order_by(
-            Inst_update.last_update.desc())
-    ).scalar_one()
+    inst = db.session.execute(db.select(Institution, Inst_update).filter(Institution.code == code)).scalar_one()
     return inst
 
 
@@ -300,3 +295,8 @@ def add_update(instcode, last_update):
     update = Inst_update(instcode, last_update)  # Create the update object
     db.session.add(update)  # Add the update to the database
     db.session.commit()  # Commit the changes
+
+
+def get_last_update(instcode):
+    update = db.session.execute(db.select(Inst_update).filter(Inst_update.instcode == instcode)).scalar_one_or_none()
+    return update
