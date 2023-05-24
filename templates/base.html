@@ -7,31 +7,31 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
 <body>
-    <header class="header">
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-            <div class="collapse navbar-collapse" id="navbarText">
-                <ul class="navbar-nav mr-auto">
-                    <li class="navbar-header">
-                        <a class="navbar-brand" href="{{ url_for('index') }}">
-                            <img class="logo" src="{{ url_for('static', filename='images/wrlc-logo-7-white.png') }}" alt="WRLC logo" />
-                            WRLC Request Status Exceptions
-                        </a>
-                    </li>
-                    {% if 'admin' in session['authorizations'] %}
-                        <li class="nav-item active">
-                            <a class="nav-link" href="{{ url_for('index') }}">Reports</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('admin') }}">Admin</a>
-                        </li>
-                    {% endif %}
-                    <li class="navbar-text">&nbsp;&nbsp;&nbsp;&nbsp;</li>
-                </ul>
-            </div>
-        </nav>
-    </header>
-
     <div class="container-fluid">
+        <header class="header">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+                <div class="collapse navbar-collapse" id="navbarText">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="navbar-header">
+                            <a class="navbar-brand" href="{{ url_for('index') }}">
+                                <img class="logo" src="{{ url_for('static', filename='images/wrlc-logo-7-white.png') }}" alt="WRLC logo" />
+                                WRLC Request Status Exceptions
+                            </a>
+                        </li>
+                        {% if 'admin' in session['authorizations'] %}
+                            <li class="nav-item active">
+                                <a class="nav-link" href="{{ url_for('index') }}">Reports</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('admin') }}">Admin</a>
+                            </li>
+                        {% endif %}
+                        <li class="navbar-text">&nbsp;&nbsp;&nbsp;&nbsp;</li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+
         <div class="messages">
             {% with messages = get_flashed_messages() %}
                 {% if messages %}
