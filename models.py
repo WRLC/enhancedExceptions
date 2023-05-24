@@ -149,7 +149,7 @@ class Event(db.Model):
         self.instcode = instcode
 
 
-class Update(db.Model):
+class Inst_update(db.Model):
     id = sa.Column(sa.BigInteger, primary_key=True)
     instcode = sa.Column(sa.ForeignKey(Institution.code))
     last_update = sa.Column(sa.DateTime, nullable=False)
@@ -197,10 +197,10 @@ def get_institution(code):
 # Get a single institution from the database as a scalar
 def get_institution_scalar(code):
     inst = db.session.execute(
-        db.select(Institution, Update).filter(
+        db.select(Institution, Inst_update).filter(
             Institution.code == code).join(
-            Update, Institution.code == Update.instcode, isouter=True).order_by(
-            Update.last_update.desc())
+            Inst_update, Institution.code == Inst_update.instcode, isouter=True).order_by(
+            Inst_update.last_update.desc())
     ).scalar_one()
     return inst
 
@@ -297,6 +297,6 @@ def user_login(session, user_data):
 
 # Add an update to the database
 def add_update(instcode, last_update):
-    update = Update(instcode, last_update)  # Create the update object
+    update = Inst_update(instcode, last_update)  # Create the update object
     db.session.add(update)  # Add the update to the database
     db.session.commit()  # Commit the changes
