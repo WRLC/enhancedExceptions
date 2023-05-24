@@ -306,5 +306,6 @@ def get_last_update(instcode):
 
 def get_all_last_updates():
     updates = db.session.execute(
-        db.select(Inst_update.instcode, sa.func.max(Inst_update.last_update)).group_by(Inst_update.instcode)).scalars()
+        db.select(Inst_update.instcode, sa.func.max(Inst_update.last_update).label('last_update')).group_by(
+            Inst_update.instcode)).scalars()
     return updates
