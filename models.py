@@ -196,7 +196,7 @@ def get_institution(code):
 
 # Get a single institution from the database as a scalar
 def get_institution_scalar(code):
-    inst = db.session.execute(db.select(Institution, Inst_update).filter(Institution.code == code)).scalar_one()
+    inst = db.session.execute(db.select(Institution).filter(Institution.code == code)).scalar_one()
     return inst
 
 
