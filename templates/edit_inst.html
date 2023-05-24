@@ -7,29 +7,29 @@
         {% endblock %}
     </h2>
     <form method="post">
-        <div class="name">
-            <label for="name">Institution Name</label>
-            <input type="text" name="name" id="name" value="{{ inst.name }}" />
+        <div class="name mb-3">
+            <label for="name" class="form-label">Institution Name</label>
+            <input type="text" name="name" id="name" value="{{ inst.name }}" class="form-control"  />
         </div>
-        <div class="code">
-            <label for="code">Institution Code</label>
-            <input type="text" name="code" id="code" value="{{ inst.code }}" />
+        <div class="code mb-3">
+            <label for="code" class="form-label">Institution Code</label>
+            <input type="text" name="code" id="code" value="{{ inst.code }}" class="form-control"  />
         </div>
-        <div class="key">
-            <label for="key">Alma API Key</label>
-            <input type="text" name="key" id="key" value="{{ inst.key }}" />
+        <div class="key mb-3">
+            <label for="key" class="form-label">Alma API Key</label>
+            <input type="text" name="key" id="key" value="{{ inst.key }}" class="form-control"  />
         </div>
-        <div class="exceptions">
-            <label for="exceptions">Exceptions Report Path</label>
-            <input type="text" name="exceptions" id="exceptions" value="{{ inst.exceptions }}" />
+        <div class="exceptions mb-3">
+            <label for="exceptions" class="form-label">Exceptions Report Path</label>
+            <input type="text" name="exceptions" id="exceptions" value="{{ inst.exceptions }}" class="form-control"  />
         </div>
-        <div class="items">
-            <label for="items">Items Report Path</label>
-            <input type="text" name="items" id="items" value="{{ inst.items }}" />
+        <div class="items mb-3">
+            <label for="items" class="form-label">Items Report Path</label>
+            <input type="text" name="items" id="items" value="{{ inst.items }}" class="form-control"  />
         </div>
-        <div class="events">
-            <label for="events">Events Report Path</label>
-            <input type="text" name="events" id="events" value="{{ inst.events }}" />
+        <div class="events mb-3">
+            <label for="events" class="form-label">Events Report Path</label>
+            <input type="text" name="events" id="events" value="{{ inst.events }}" class="form-control"  />
         </div>
         <div class="actions">
             <input type="submit" value="Update institution"  class="btn btn-primary" />
