@@ -3,9 +3,6 @@
 {% block content %}
     <h2>Reports</h2>
     <p>Reports are generated from the data in the database.</p>
-    {% for upd in updates %}
-        {{ upd }}
-    {% endfor %}
     {% if institutions %}
         <table class="table table-bordered table-hover table-sm">
             <thead class="table-dark sticky-top">
@@ -20,8 +17,8 @@
                     <tr>
                         <td><a href="{{ url_for('report', code=institution.code) }}">{{ institution.name }}</a></td>
                         <td>{{ institution.code }}</td>
-                        {% for upd in updates if upd.instcode == institution.code %}
-                            <td>{{ upd.lastupdated }}</td>
+                        {% for upd in updates if upd[0] == institution.code %}
+                            <td>{{ upd[1] }}</td>
                         {% endfor %}
                     </tr>
                 {% endfor %}
