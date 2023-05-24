@@ -196,10 +196,11 @@ def get_institution(code):
 
 # Get a single institution from the database as a scalar
 def get_institution_scalar(code):
-    inst = db.session.execute(db.select(Institution, Update).filter(
-        Institution.code == code)).join(
-        Update, Institution.code == Update.instcode, isouter=True).order_by(
-        Update.last_update.desc()
+    inst = db.session.execute(
+        db.select(Institution, Update).filter(
+            Institution.code == code).join(
+            Update, Institution.code == Update.instcode, isouter=True).order_by(
+            Update.last_update.desc())
     ).scalar_one()
     return inst
 
