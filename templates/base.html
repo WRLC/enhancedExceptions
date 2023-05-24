@@ -7,9 +7,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
 <body>
-    <div class="container-fluid">
-        <header class="header">
-            <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <header class="header">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <div class="container-fluid">
                 <div class="collapse navbar-collapse" id="navbarText">
                     <ul class="navbar-nav mr-auto">
                         <li class="navbar-header">
@@ -29,9 +29,10 @@
                         <li class="navbar-text">&nbsp;&nbsp;&nbsp;&nbsp;</li>
                     </ul>
                 </div>
-            </nav>
-        </header>
-
+            </div>
+        </nav>
+    </header>
+    <div class="container-fluid">
         <div class="messages">
             {% with messages = get_flashed_messages() %}
                 {% if messages %}
@@ -40,7 +41,7 @@
                     {% endfor %}
                 {% endif %}
             {% endwith %}
-    </div>
+        </div>
         {% block content %} {% endblock %}
         {% if 'username' in session %}
             <div>
