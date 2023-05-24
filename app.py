@@ -82,13 +82,7 @@ def new_login():
     if 'wrt' in request.cookies:
         encoded_token = request.cookies['wrt']
         user_data = jwt.decode(encoded_token, app.config['SHARED_SECRET'], algorithms=['HS256'])
-        session['username'] = user_data['primary_id']
-        session['user_home'] = user_data['inst']
-        session['display_name'] = user_data['full_name']
-        session['authorizations'] = user_data['authorizations']
-
-        user_login(session)
-
+        user_login(session, user_data)
         return redirect(url_for('index'))
     else:
         return "no login cookie"

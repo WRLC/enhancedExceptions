@@ -149,6 +149,16 @@ class Event(db.Model):
         self.instcode = instcode
 
 
+class Update(db.Model):
+    id = sa.Column(sa.BigInteger, primary_key=True)
+    instcode = sa.Column(sa.ForeignKey(Institution.code))
+    last_update = sa.Column(sa.DateTime, nullable=False)
+
+    def __init__(self, instcode, last_update):
+        self.instcode = instcode
+        self.last_update = last_update
+
+
 class User(db.Model):
     id = sa.Column(sa.Integer, primary_key=True)
     username = sa.Column(sa.String(255), nullable=False)
@@ -186,7 +196,11 @@ def get_institution(code):
 
 # Get a single institution from the database as a scalar
 def get_institution_scalar(code):
-    inst = db.session.execute(db.select(Institution).filter(Institution.code == code)).scalar_one()
+    inst = db.session.execute(db.select(Institution, Update).filter(
+        Institution.code == code)).join(
+        Update, Institution.code == Update.instcode, isouter=True).order_by(
+        Update.last_update.desc()
+    ).scalar_one()
     return inst
 
 
@@ -221,23 +235,26 @@ def submit_inst_edit_form(request, institution):
         return redirect(url_for('institution_detail', code=institution.code))
 
 
+# Check if the user exists in the database
 def check_user(username):
     user = db.session.execute(db.select(User).filter(User.username == username)).scalar_one_or_none()
     return user
 
 
+# Set the last login time for the user
 def set_last_login(user):
-    user.last_login = datetime.now()
-    db.session.commit()
+    user.last_login = datetime.now()  # Set the last login time to the current time
+    db.session.commit()  # Commit the changes
 
 
+# Set the user's admin status based on the database
 def set_user_admin(user, session):
-    if user.admin is True:
-        session['authorizations'].append('admin')
+    if user.admin is True:  # Check if the user is an admin
+        session['authorizations'].append('admin')  # If they are, add the admin authorization to the session
 
 
+# Check if the username is in the admin list
 def admincheck_user(session):
-    # If the user does not exist in the database, add them
     if session['username'] in admins:  # Check if the user is an admin
         admincheck = True  # If they are, set admincheck to True
     else:
@@ -246,22 +263,39 @@ def admincheck_user(session):
     return admincheck
 
 
+# Add the user to the database
 def add_user(session, admincheck):
+
+    # Create the user object
     user = User(session['username'], session['display_name'], session['user_home'], admincheck, datetime.now())
-    db.session.add(user)
-    db.session.commit()
+    db.session.add(user)  # Add the user to the database
+    db.session.commit()  # Commit the changes
 
 
-def user_login(session):
-    # Check if the user exists in the database
-    user = check_user(session['username'])
+# Log the user in
+def user_login(session, user_data):
 
-    # If the user exists in the database...
+    # Set the session variables
+    session['username'] = user_data['primary_id']  # Set the username
+    session['user_home'] = user_data['inst']  # Set the user's home institution
+    session['display_name'] = user_data['full_name']  # Set the user's display name
+    session['authorizations'] = user_data['authorizations']  # Set the user's authorizations
+
+    user = check_user(session['username'])  # Check if the user exists in the database
+
+    # If the user is in the database...
     if user is not None:
-        set_last_login(user)
-        set_user_admin(user, session)
-    else:
-        admincheck = admincheck_user(session)
+        set_last_login(user)  # ..set the last login time for the user
+        set_user_admin(user, session)  # ..set the user's admin status
 
-        # Add the user to the database
-        add_user(session, admincheck)
+    # If the user isn't in the database...
+    else:
+        admincheck = admincheck_user(session)  # ...check if the user is an admin
+        add_user(session, admincheck)  # ...add the user to the database
+
+
+# Add an update to the database
+def add_update(instcode, last_update):
+    update = Update(instcode, last_update)  # Create the update object
+    db.session.add(update)  # Add the update to the database
+    db.session.commit()  # Commit the changes
