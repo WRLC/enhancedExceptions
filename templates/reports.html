@@ -17,8 +17,8 @@
                     <tr>
                         <td><a href="{{ url_for('report', code=institution.code) }}">{{ institution.name }}</a></td>
                         <td>{{ institution.code }}</td>
-                        {% for upd in updates if upd.instcode == institution.code %}
-                            <td>{{ upd.last_updated }}</td>
+                        {% for upd in updates %}
+                            <td>{{ upd }}</td>
                         {% endfor %}
                     </tr>
                 {% endfor %}
