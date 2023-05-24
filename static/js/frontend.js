@@ -29,6 +29,8 @@ function mergeCells(status) {
             dbRows[lastRow].cells[4].rowSpan = lastCounter;
             dbRows[lastRow].cells[5].rowSpan = lastCounter;
             dbRows[lastRow].cells[6].rowSpan = lastCounter;
+            dbRows[lastRow].cells[12].rowSpan = lastCounter;
+            dbRows[lastRow].cells[13].rowSpan = lastCounter;
             dbRows[i].cells[0].style.display = "none";
             dbRows[i].cells[1].style.display = "none";
             dbRows[i].cells[2].style.display = "none";
@@ -36,6 +38,8 @@ function mergeCells(status) {
             dbRows[i].cells[4].style.display = "none";
             dbRows[i].cells[5].style.display = "none";
             dbRows[i].cells[6].style.display = "none";
+            dbRows[i].cells[12].style.display = "none";
+            dbRows[i].cells[13].style.display = "none";
         } else {
             dbRows[i].cells[0].style.display = "table-cell";
             dbRows[i].cells[1].style.display = "table-cell";
@@ -44,6 +48,8 @@ function mergeCells(status) {
             dbRows[i].cells[4].style.display = "table-cell";
             dbRows[i].cells[5].style.display = "table-cell";
             dbRows[i].cells[6].style.display = "table-cell";
+            dbRows[i].cells[12].style.display = "table-cell";
+            dbRows[i].cells[13].style.display = "table-cell";
             lastValue = thisValue;
             lastCounter = 1;
             lastRow = i;
