@@ -302,3 +302,9 @@ def get_last_update(instcode):
         db.select(Inst_update).filter(Inst_update.instcode == instcode).order_by(sa.desc(
             Inst_update.last_update))).first()
     return update
+
+
+def get_all_last_updates():
+    updates = db.session.execute(
+        db.select(Inst_update.instcode, max(Inst_update.last_update))).scalars()
+    return updates

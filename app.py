@@ -2,7 +2,7 @@ from settings import database, shared_secret
 from flask import Flask, render_template, request, redirect, url_for, session
 from models import (
     Institution, get_all_institutions, submit_inst_add_form, submit_inst_edit_form, get_institution_scalar,
-    get_institution, User, user_login, get_last_update
+    get_institution, User, user_login, get_last_update, get_all_last_updates
 )
 from utils import db
 from functools import wraps
@@ -64,8 +64,9 @@ def index():
 
     # Get the list of institutions
     insts = get_all_institutions()
+    updates = get_all_last_updates()
 
-    return render_template('reports.html', institutions=insts)
+    return render_template('reports.html', institutions=insts, updates=updates)
 
 
 @app.route('/login')
