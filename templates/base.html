@@ -11,6 +11,12 @@
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
             <div class="collapse navbar-collapse" id="navbarText">
                 <ul class="navbar-nav mr-auto">
+                    <li class="navbar-header">
+                        <a class="navbar-brand" href="{{ url_for('index') }}">
+                            <img class="logo" src="{{ url_for('static', filename='image/wrlc-logo-7-white.png') }}" alt="WRLC logo" />
+                            WRLC Request Status Exceptions
+                        </a>
+                    </li>
                     {% if 'admin' in session['authorizations'] %}
                         <li class="nav-item active">
                             <a class="nav-link" href="{{ url_for('index') }}">Reports</a>
@@ -20,9 +26,6 @@
                         </li>
                     {% endif %}
                     <li class="navbar-text">&nbsp;&nbsp;&nbsp;&nbsp;</li>
-                    <li class="navbar-header">
-                        <a class="navbar-brand" href="{{ url_for('index') }}">WRLC Request Status Exceptions</a>
-                    </li>
                 </ul>
             </div>
         </nav>

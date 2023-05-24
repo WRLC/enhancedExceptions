@@ -22,3 +22,9 @@
     font-weight: 600;
     margin-bottom: 5px;
 }
+
+.logo {
+    max-height: 40px;
+    vertical-align: middle;
+    border: 0;
+}
