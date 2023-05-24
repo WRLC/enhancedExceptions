@@ -3,7 +3,9 @@
 {% block content %}
     <h2>Reports</h2>
     <p>Reports are generated from the data in the database.</p>
-    {{ updates }}
+    {% for upd in updates %}
+        {{ upd }}
+    {% endfor %}
     {% if institutions %}
         <table class="table table-bordered table-hover table-sm">
             <thead class="table-dark sticky-top">
