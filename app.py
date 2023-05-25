@@ -1,5 +1,5 @@
 from settings import database, shared_secret
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, abort
 from models import (
     Institution, get_all_institutions, submit_inst_add_form, submit_inst_edit_form, get_institution_scalar,
     get_institution, User, user_login, get_last_update, get_all_last_updates
@@ -39,6 +39,23 @@ atexit.register(lambda: scheduler.shutdown())
 def update_reports():
     with scheduler.app.app_context():
         schedulers.update_reports()
+
+
+# set up error handlers & templates for HTTP codes used in abort()
+#   see http://flask.pocoo.org/docs/1.0/patterns/errorpages/
+@app.errorhandler(400)
+def badrequest(e):
+    return render_template('error_400.html', e=e), 400
+
+
+@app.errorhandler(403)
+def forbidden(e):
+    return render_template('unauthorized.html', e=e), 403
+
+
+@app.errorhandler(500)
+def internalerror(e):
+    return render_template('error_500.html', e=e), 500
 
 
 # decorator for pages that need auth
@@ -84,7 +101,11 @@ def new_login():
         encoded_token = request.cookies['wrt']
         user_data = jwt.decode(encoded_token, app.config['SHARED_SECRET'], algorithms=['HS256'])
         user_login(session, user_data)
-        return redirect(url_for('index'))
+
+        if 'exceptions' in session['authorizations']:
+            return redirect(url_for('index'))
+        else:
+            abort(403)
     else:
         return "no login cookie"
 
@@ -100,6 +121,8 @@ def logout():
 @app.route('/<code>')
 @auth_required
 def report(code):
+    if session['user_home'] != code and 'admin' not in session['authorizations']:
+        abort(403)
     inst = get_institution_scalar(code)
     statuses = Institution.get_statuses(inst)
     last_update = get_last_update(code)
@@ -115,7 +138,7 @@ def report(code):
 @auth_required
 def admin():
     if 'admin' not in session['authorizations']:
-        return redirect(url_for('index'))
+        abort(403)
     return render_template('admin.html')
 
 
@@ -124,7 +147,7 @@ def admin():
 @auth_required
 def admin_institutions():
     if 'admin' not in session['authorizations']:
-        return redirect(url_for('index'))
+        abort(403)
 
     # Get the list of institutions
     insts = get_all_institutions()
@@ -147,7 +170,7 @@ def add_institution():
 @auth_required
 def institution_detail(code):
     if 'admin' not in session['authorizations']:
-        return redirect(url_for('index'))
+        abort(403)
 
     # Get the institution object
     institution = get_institution(code)
@@ -159,7 +182,7 @@ def institution_detail(code):
 @auth_required
 def institution_edit(code):
     if 'admin' not in session['authorizations']:
-        return redirect(url_for('index'))
+        abort(403)
 
     # Get the institution object
     institution = get_institution(code)
@@ -174,7 +197,7 @@ def institution_edit(code):
 @auth_required
 def admin_users():
     if 'admin' not in session['authorizations']:
-        return redirect(url_for('index'))
+        abort(403)
 
     # Get the list of users
     users = db.session.execute(db.select(User).order_by(User.last_login.desc())).scalars()

@@ -246,6 +246,8 @@ def set_last_login(user):
 # Set the user's admin status based on the database
 def set_user_admin(user, session):
     if user.admin is True:  # Check if the user is an admin
+        if 'exceptions' not in session['authorizations']:
+            session['authorizations'].append('exceptions')  # If they are, add the admin authorization to the session
         session['authorizations'].append('admin')  # If they are, add the admin authorization to the session
 
 
@@ -275,14 +277,15 @@ def user_login(session, user_data):
     session['username'] = user_data['primary_id']  # Set the username
     session['user_home'] = user_data['inst']  # Set the user's home institution
     session['display_name'] = user_data['full_name']  # Set the user's display name
-    session['authorizations'] = user_data['authorizations']  # Set the user's authorizations
+    session['authorizations'] = []
 
     user = check_user(session['username'])  # Check if the user exists in the database
 
     # If the user is in the database...
     if user is not None:
-        set_last_login(user)  # ..set the last login time for the user
         set_user_admin(user, session)  # ..set the user's admin status
+        if 'exceptions' in session['authorizations']:
+            set_last_login(user)  # ..set the last login time for the user
 
     # If the user isn't in the database...
     else:
