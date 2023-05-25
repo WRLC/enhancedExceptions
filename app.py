@@ -1,4 +1,4 @@
-from settings import database, shared_secret
+from settings import database, shared_secret, log_file
 from flask import Flask, render_template, request, redirect, url_for, session, abort
 from models import (
     Institution, get_all_institutions, submit_inst_add_form, submit_inst_edit_form, get_institution_scalar,
@@ -11,14 +11,24 @@ import os
 import jwt
 from flask_apscheduler import APScheduler
 import atexit
+import logging
+from logging.handlers import TimedRotatingFileHandler
 
 # create app
 app = Flask(__name__)
+
+# set up logging to work with WSGI server
+if __name__ != '__main__':
+    gunicorn_logger = logging.getLogger('gunicorn.error')
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(gunicorn_logger.level)
+
 app.config['SCHEDULER_API_ENABLED'] = True
 app.config['SESSION_KEY'] = os.urandom(24)
 app.config['SHARED_SECRET'] = shared_secret
 app.config['SQLALCHEMY_DATABASE_URI'] = database
 app.secret_key = app.config['SESSION_KEY']
+app.config['LOG_FILE'] = log_file
 db.init_app(app)
 
 # create database
@@ -56,6 +66,15 @@ def forbidden(e):
 @app.errorhandler(500)
 def internalerror(e):
     return render_template('error_500.html', e=e), 500
+
+
+# audit log
+audit_log = logging.getLogger('audit')
+audit_log.setLevel(logging.INFO)
+file_handler = TimedRotatingFileHandler(app.config['LOG_FILE'], when='midnight')
+file_handler.setLevel(logging.INFO)
+file_handler.setFormatter(logging.Formatter('%(asctime)s\t%(message)s'))
+audit_log.addHandler(file_handler)
 
 
 # decorator for pages that need auth
@@ -205,4 +224,4 @@ def admin_users():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
