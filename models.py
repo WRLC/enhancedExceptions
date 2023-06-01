@@ -26,7 +26,32 @@ class Institution(db.Model):
         self.items = items
         self.events = events
 
-    # Get a single institution's requests from the database
+    # Get all requests for an institution
+    def get_all_requests(self):
+        requests = db.session.execute(db.select(
+            Request.borreqstat.label('Borrowing Request Status'),
+            Request.internalid.label('Internal ID'),
+            Request.borcreate.label('Borrowing Request Date'),
+            Request.title.label('Title'),
+            Request.author.label('Author'),
+            Request.networknum.label('Network Number'),
+            Request.partnerstat.label('Partner Active Status'),
+            Request.reqsend.label('Request Sending Date'),
+            Request.days.label('Days Since Request'),
+            Request.requestor.label('Requestor'),
+            Request.partnername.label('Partner Name'),
+            Request.partnercode.label('Partner Code'),
+            Event.eventstart.label('In Transit Start')
+        ).join(Item, Item.fulfillmentreqid == Request.fulfillmentreqid, isouter=True).join(
+            Event, Event.itemid == Item.itemid, isouter=True
+        ).filter(
+            Request.instcode == self.code
+        ).order_by(
+            Request.borreqstat, Request.internalid.desc(), Request.borcreate.desc(), Request.reqsend.desc()
+        )).all()
+        return requests
+
+    # Get a single institution's requests by status from the database
     def get_requests(self, status):
         requests = db.session.execute(db.select(
             Request.borreqstat, Request.internalid, Request.borcreate, Request.title, Request.author,

@@ -2,7 +2,15 @@
 
 {% block content %}
     <h2>{{ inst.name }}</h2>
-    <div><span class="text-muted">Last Updated: {{ update[0].last_update }}</span></div>
+    <div class="row mb-2">
+        <div class="col">
+            <span class="text-muted">Last Updated: {{ update[0].last_update }}</span>
+        </div>
+        <div class="col text-end">
+            <a href="{{ url_for('report_download', code=inst.code) }}" class="btn btn-success">Download XLSX</a>
+        </div>
+    </div>
+
     {% if requests|length == 0 %}
         <p>No requests found.</p>
     {% endif %}
