@@ -302,7 +302,7 @@ def user_login(session, user_data):
     session['username'] = user_data['primary_id']  # Set the username
     session['user_home'] = user_data['inst']  # Set the user's home institution
     session['display_name'] = user_data['full_name']  # Set the user's display name
-    session['authorizations'] = []
+    session['authorizations'] = user_data['authorizations']  # Set the user's authorizations
 
     user = check_user(session['username'])  # Check if the user exists in the database
 
