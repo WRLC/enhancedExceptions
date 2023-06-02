@@ -1,5 +1,5 @@
 from settings import database, shared_secret, log_file
-from flask import Flask, render_template, request, redirect, url_for, session, abort
+from flask import Flask, render_template, request, redirect, url_for, session, abort, flash
 from models import (
     Institution, get_all_institutions, submit_inst_add_form, submit_inst_edit_form, get_institution_scalar,
     get_institution, User, user_login, get_last_update, get_all_last_updates
@@ -14,6 +14,7 @@ import atexit
 import logging
 from logging.handlers import TimedRotatingFileHandler
 import flask_excel as excel
+import sys
 
 # create app
 app = Flask(__name__)
@@ -99,6 +100,8 @@ def auth_required(f):
 def index():
     # Check if the user is an admin
     if 'admin' not in session['authorizations']:
+        flash(session['user_home'])
+        print(session['user_home'], file=sys.stderr)
         # If not, redirect to the reports page for their institution
         return redirect(url_for('report'), code=session['user_home'])
 
